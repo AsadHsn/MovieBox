@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Movie Box</string>
+    <string name="hello_world1">Title</string>
+    <string name="hello_world2">Release Date</string>
+    <string name="hello_world3">Rating</string>
+    <string name="hello_world4">Overview</string>
+    <string name="action_settings">Settings</string>
+
+
+    <string-array name="sort_options_array">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
+    <string name="title_activity_movie_detail">Movie Details</string>
+
+</resources>
