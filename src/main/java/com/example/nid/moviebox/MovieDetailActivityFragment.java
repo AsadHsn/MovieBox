@@ -1,5 +1,6 @@
 package com.example.nid.moviebox;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -9,11 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +27,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -34,13 +40,28 @@ public class MovieDetailActivityFragment extends Fragment {
 
     MovieBean objIntentMovieBean;
 
+    TrailerList TrailerListAdapterObject;
+
     public MovieDetailActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_movie_detail, container, false);
+
+        View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+
+//        ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
+//
+//        MovieBean objMovieBean= new MovieBean();
+//
+//        ArrayList<MovieBean> tempData = populateTrailerDummyData();
+//
+//        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
+//
+//        listview.setAdapter(TrailerListAdapterObject);
+
+        return rootView;
     }
 
     @Override
@@ -109,20 +130,56 @@ public class MovieDetailActivityFragment extends Fragment {
 
         ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
 
-        String PosterPathHref="http://image.tmdb.org/t/p/w185/"+objIntentMovieBean.getPoster_path();
+        String PosterPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getPoster_path();
+    //    PosterPathHref="http://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg";
+        Log.v("PosterPath", PosterPathHref);
+      //  Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
         Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
 
         TextView objTitleText = (TextView) getView().findViewById(R.id.movie_title_Highlight);
-        objTitleText.setText(objIntentMovieBean.getTitle());
+        objTitleText.setText(objMovieBean.getTitle());
 
         TextView objTextRelease = (TextView) getView().findViewById(R.id.movie_release_date);
-        objTextRelease.setText(objIntentMovieBean.getRelease_date());
+        objTextRelease.setText(objMovieBean.getRelease_date().substring(0, 4));
 
         TextView objTextRating = (TextView) getView().findViewById(R.id.movie_rating);
-        objTextRating.setText( Float.toString(objIntentMovieBean.getVote_average())+"/10");
+        objTextRating.setText( Float.toString(objMovieBean.getVote_average())+"/10");
 
-        TextView objTextView = (TextView) getView().findViewById(R.id.description);
-        objTextView.setText("Synopsis: \n"+objIntentMovieBean.getOverview());
+        TextView objTextView = (TextView) getView().findViewById(R.id.description_detail);
+        objTextView.setText(objMovieBean.getOverview());
+
+
+        LinearLayout layout = (LinearLayout)getView().findViewById(R.id.trailer_images_filler);
+
+
+            int counter=0;
+
+            for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
+
+                Log.v("getView====>",valueTrailer.getTrailername());
+                Log.v("getView====>", valueTrailer.getSource());
+
+                ImageView image = new ImageView(getActivity());
+                image.setBackgroundResource(R.drawable.martianposter);
+                image.setId(counter);
+                layout.addView(image);
+
+                counter++;
+
+            }
+
+        layout.setOnClickListener(new LinearLayout.OnClickListener() {
+
+            public void onClick(View v) {
+
+
+                //to be added
+
+            }
+
+
+        });
+
 
 
 
@@ -163,19 +220,28 @@ public class MovieDetailActivityFragment extends Fragment {
 
             String apikey = getActivity().getString(R.string.api_key );
 
+            //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=releases,trailers
+            //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=trailers
+            //http://api.themoviedb.org/3/movie/550/videos
+
+            //actual URL
+           // https://www.youtube.com/watch?v=8hP9D6kZseM
 
             try {
 
                 final String MOVIE_DETAILDB_BASE_URL =
                         "http://api.themoviedb.org/3/movie/";
                 final String API_KEY = "api_key";
+                final String APPENDTRAILER="append_to_response";
+                final String appendTrailerVaule="trailers";
 
                int Movieid= MovieBeanForId.getId();
-                Log.v(MovieDetailActivityFragment.class.getSimpleName(),Integer.toString(MovieBeanForId.getId()));
+                Log.v(MovieDetailActivityFragment.class.getSimpleName(), Integer.toString(MovieBeanForId.getId()));
 
 
                 Uri builtUri = Uri.parse(MOVIE_DETAILDB_BASE_URL + Integer.toString(Movieid) + "?").buildUpon()
                         .appendQueryParameter(API_KEY, apikey)
+                        .appendQueryParameter(APPENDTRAILER,appendTrailerVaule)
                         .build();
 
                 URL url = new URL(builtUri.toString());
@@ -268,6 +334,38 @@ public class MovieDetailActivityFragment extends Fragment {
                 int VoteAvg = jsonBaseObject.getInt("vote_average");
                 String plotSynopsis = jsonBaseObject.getString("overview");
 
+                JSONObject jsonObjectTrailer = jsonBaseObject.getJSONObject("trailers");
+                JSONArray jsonArrayTrailerYoutube=jsonObjectTrailer.getJSONArray("youtube");
+
+
+                List<Trailer> ArrListTrailers= new ArrayList<Trailer>();
+
+
+
+                for(int j=0; j < jsonArrayTrailerYoutube.length(); j++){
+
+                    JSONObject jsonObjectTrailerData = jsonArrayTrailerYoutube.getJSONObject(j);
+
+                    String trailerOrigin = "youtube";
+                    String trailername = jsonObjectTrailerData.getString("name");
+                    String size = jsonObjectTrailerData.getString("size");
+                    String source = jsonObjectTrailerData.getString("source");
+                    String type = jsonObjectTrailerData.getString("type");
+
+                    Trailer TrailerObject=new Trailer();
+                    TrailerObject.setTrailerOrigin(trailerOrigin);
+                    TrailerObject.setTrailername(trailername);
+                    TrailerObject.setSize(size);
+                    TrailerObject.setSource(source);
+                    TrailerObject.setType(type);
+
+                    Log.v(FetchMovieDetailTask.class.getName(), "Trailer-> " + TrailerObject.getSource()+TrailerObject.getTrailername());
+
+                    ArrListTrailers.add(j, TrailerObject);
+
+                }
+
+
                 objMovieBean=new MovieBean();
 
                 objMovieBean.setTitle(title);
@@ -275,6 +373,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 objMovieBean.setPoster_path(movieposter);
                 objMovieBean.setVote_average(VoteAvg);
                 objMovieBean.setOverview(plotSynopsis);
+                objMovieBean.setTrailerList(ArrListTrailers);
 
                 Log.v(FetchMovieDetailTask.class.getName(), "IN PARSER-> "+objMovieBean.getRelease_date());
 
@@ -306,7 +405,99 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
+    //Adapter for  Listview
+    public class TrailerList extends ArrayAdapter<MovieBean> {
 
+        private final Activity context;
+        public ArrayList<MovieBean> adapterData;
+     //   private final Integer[] imageId;
+
+        public TrailerList(Activity context,ArrayList<MovieBean> web, int resource) {
+            super(context, R.layout.detail_fragment_trailer_listview, web);
+
+
+            this.adapterData = web;
+            this.context = context;
+         //   this.imageId = imageId;
+
+
+        }
+
+
+        @Override
+        public View getView(int position, View view, ViewGroup parent) {
+            Integer it=position;
+            Log.v("getView Called",it.toString() );
+            LayoutInflater inflater = context.getLayoutInflater();
+            View rowView= inflater.inflate(R.layout.detail_fragment_trailer_listview, null, true);
+
+            TextView txtTitle = (TextView) rowView.findViewById(R.id.list_item_trailer_name);
+
+            for (final MovieBean value : adapterData) {
+             //   Log.v("getView====>",value.getArtistName());
+                Integer iy=adapterData.size();
+                Log.v("Shouldbe1=>", iy.toString());
+
+                for (final Trailer valueTrailer : value.getTrailerList()) {
+                   // Log.v("getView====>",valueTrailer.getTrailerOrigin());
+                    Log.v("getView====>",valueTrailer.getTrailername());
+
+                }
+            }
+
+
+
+                //Data is withing Moviebean Arraylist and then in Trailer arraylist, however moviebean is of size 1
+            txtTitle.setText(adapterData.get(0).getTrailerList().get(position).getTrailername());
+
+           ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_image);
+
+            //this has to be updated to play button image later on
+            Picasso.with(context).load("http://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg").into(imageView);
+
+
+
+            return rowView;
+        }
+
+        @Override
+        public int getCount() {
+              Log.v("getCount Called",Integer.toString( adapterData.get(0).getTrailerList().size()));
+            return adapterData.get(0).getTrailerList().size();
+
+            //  return super.getCount();
+        }
+
+
+
+    }
+
+    private ArrayList<MovieBean> populateTrailerDummyData() {
+
+        MovieBean objMovieBean= new MovieBean();
+
+        ArrayList<MovieBean> tempMovie = new ArrayList<MovieBean>();
+
+        ArrayList<Trailer> tempTrailer = new ArrayList<Trailer>();
+
+
+        Trailer objTrailer = new Trailer();
+        objTrailer.setTrailername("Test Trailer 1");
+        tempTrailer.add(0,objTrailer);
+        objTrailer.setTrailername("Test Trailer 2");
+        tempTrailer.add(1,objTrailer);
+        objTrailer.setTrailername("Test Trailer 3");
+        tempTrailer.add(2,objTrailer);
+
+        objMovieBean.setTrailerList(tempTrailer);
+
+
+
+        tempMovie.add(objMovieBean);
+
+        return tempMovie;
+
+    }
 
 
 }

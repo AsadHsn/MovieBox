@@ -33,7 +33,19 @@ public class MovieBean implements Serializable {
     List<Integer> genre_ids;
     int id;
 
+    List<Trailer> trailerList;
 
+
+
+
+
+    public List<Trailer> getTrailerList() {
+        return trailerList;
+    }
+
+    public void setTrailerList(List<Trailer> trailerList) {
+        this.trailerList = trailerList;
+    }
 
     public String getBackdrop_path() {
         return backdrop_path;
