@@ -20,11 +20,13 @@
             </intent-filter>
         </activity>
         <activity
-
             android:name=".MovieDetailActivity"
             android:label="@string/title_activity_movie_detail" >
         </activity>
-
+        <activity
+            android:name=".ReviewDetail"
+            android:label="@string/title_activity_review_detail" >
+        </activity>
     </application>
 
 </manifest>

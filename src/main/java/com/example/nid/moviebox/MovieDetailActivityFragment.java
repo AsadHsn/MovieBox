@@ -1,7 +1,11 @@
 package com.example.nid.moviebox;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,10 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -25,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -41,6 +49,12 @@ public class MovieDetailActivityFragment extends Fragment {
     MovieBean objIntentMovieBean;
 
     TrailerList TrailerListAdapterObject;
+
+    String SHARED_PREFS_FILE="MovieF";
+
+    String SHARED_PREFS_FILE_NEW="SHARED_PREFS_FILE_NEW";
+
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE2";
 
     public MovieDetailActivityFragment() {
     }
@@ -149,8 +163,45 @@ public class MovieDetailActivityFragment extends Fragment {
         objTextView.setText(objMovieBean.getOverview());
 
 
-        LinearLayout layout = (LinearLayout)getView().findViewById(R.id.trailer_images_filler);
+        Button objButton=(Button) getView().findViewById(R.id.faourite_button);
+        if(checkInSharedPrefrence(objMovieBean))
+        {
+            objButton.setBackgroundColor(Color.parseColor("#FF5722"));
+        }
 
+        objButton.setOnClickListener(new Button.OnClickListener() {
+
+            public void onClick(View v) {
+
+                //to be added
+                Log.e("getView====>", "Oclicklistener called Id->" + v.getId());
+                Log.e("ButtonOnclick->", Integer.toString(objMovieBean.getId()));
+
+                if(!checkInSharedPrefrence(objMovieBean))
+                {
+                    Log.e("addInSharedPrefrence->", Integer.toString(objMovieBean.getId()));
+                    addInSharedPrefrence(objMovieBean);
+                    v.setBackgroundColor(Color.parseColor("#FF5722"));
+                }
+                else
+                {
+                    Log.e("removefromSharedPrefr->", Integer.toString(objMovieBean.getId()));
+                    removefromSharedPrefrence(objMovieBean);
+                    v.setBackgroundColor(Color.parseColor("#607D8B"));
+                }
+
+
+
+
+
+
+            }
+
+
+        });
+
+        LinearLayout layout = (LinearLayout)getView().findViewById(R.id.trailer_images_filler);
+        layout.removeAllViewsInLayout();
 
             int counter=0;
 
@@ -160,25 +211,80 @@ public class MovieDetailActivityFragment extends Fragment {
                 Log.v("getView====>", valueTrailer.getSource());
 
                 ImageView image = new ImageView(getActivity());
-                image.setBackgroundResource(R.drawable.martianposter);
+           //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
+                Picasso.with(getActivity()).load(PosterPathHref).into(image);
+              //  image.setBackgroundResource(R.drawable.martianposter);
                 image.setId(counter);
+                image.setTag(valueTrailer.getSource());
                 layout.addView(image);
-
                 counter++;
+
+
+                image.setOnClickListener(new ImageView.OnClickListener() {
+
+                    public void onClick(View v) {
+
+                        //to be added
+                        Log.v("getView====>", "Oclicklistener called Id->"+v.getId());
+                        startVideo((String)v.getTag());
+
+                    }
+
+
+                });
 
             }
 
-        layout.setOnClickListener(new LinearLayout.OnClickListener() {
+        TextView objTextviewReview = (TextView)getView().findViewById(R.id.description_Review);
+        objTextviewReview.setLines(9);
+        try
+        {
+            objTextviewReview.setText(objMovieBean.getReviewlist().get(0).getContent());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        TextView objTextReviewAuthor = (TextView)getView().findViewById(R.id.atuhor_review);
+        try
+        {
+            objTextReviewAuthor.setText("Review by " + objMovieBean.getReviewlist().get(0).getAuthor());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        objTextviewReview.setOnClickListener(new TextView.OnClickListener() {
 
             public void onClick(View v) {
 
-
                 //to be added
+                Log.v("getView====>", "Review Onclicklistener called Id->"+v.getId());
+
+                String textData="";
+                for (final Review valueReview : objMovieBean.getReviewlist()) {
+                    // Log.v("getView====>",valueTrailer.getTrailerOrigin());
+                    Log.v("getView====>",valueReview.getAuthor());
+
+                    textData=textData+valueReview.getContent()+"\n";
+                    textData=textData+"By "+valueReview.getAuthor()+"\n\n\n";
+
+                }
+
+                Intent IntentReviewDetailActivity = new Intent(getActivity(), ReviewDetail.class);
+
+                IntentReviewDetailActivity.putExtra("REVIEW", textData);
+
+                startActivity(IntentReviewDetailActivity);
+
 
             }
 
 
         });
+
 
 
 
@@ -233,7 +339,7 @@ public class MovieDetailActivityFragment extends Fragment {
                         "http://api.themoviedb.org/3/movie/";
                 final String API_KEY = "api_key";
                 final String APPENDTRAILER="append_to_response";
-                final String appendTrailerVaule="trailers";
+                final String appendTrailerVaule="trailers,reviews";
 
                int Movieid= MovieBeanForId.getId();
                 Log.v(MovieDetailActivityFragment.class.getSimpleName(), Integer.toString(MovieBeanForId.getId()));
@@ -329,8 +435,10 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 JSONObject jsonBaseObject = new JSONObject(JsonStr);
                 String title = jsonBaseObject.getString("title");
+                int Mid=Integer.parseInt(jsonBaseObject.optString("id"));
                 String relasedate = jsonBaseObject.getString("release_date");
                 String movieposter = jsonBaseObject.getString("poster_path");
+                String backdrop = jsonBaseObject.getString("backdrop_path");
                 int VoteAvg = jsonBaseObject.getInt("vote_average");
                 String plotSynopsis = jsonBaseObject.getString("overview");
 
@@ -365,15 +473,45 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 }
 
+                JSONObject jsonObjectReview = jsonBaseObject.getJSONObject("reviews");
+                JSONArray jsonArrayReviews=jsonObjectReview.getJSONArray("results");
+
+                List<Review> ArrListReviews= new ArrayList<Review>();
+                for(int j=0; j < jsonArrayReviews.length(); j++) {
+
+                    JSONObject jsonObjectReviewData = jsonArrayReviews.getJSONObject(j);
+
+                    String id = jsonObjectReviewData.getString("id");
+                    String author = jsonObjectReviewData.getString("author");
+                    String content = jsonObjectReviewData.getString("content");
+                    String url = jsonObjectReviewData.getString("url");
+
+                    Review objReview = new Review();
+                    objReview.setId(id);
+                    objReview.setAuthor(author);
+                    objReview.setContent(content);
+                    objReview.setUrl(url);
+
+                    Log.v(FetchMovieDetailTask.class.getName(), "Review-> " + objReview.getAuthor() + objReview.getContent());
+
+
+                    ArrListReviews.add(j,objReview);
+
+                }
+
+
 
                 objMovieBean=new MovieBean();
 
                 objMovieBean.setTitle(title);
+                objMovieBean.setId(Mid);
                 objMovieBean.setRelease_date(relasedate);
                 objMovieBean.setPoster_path(movieposter);
+                objMovieBean.setBackdrop_path(backdrop);
                 objMovieBean.setVote_average(VoteAvg);
                 objMovieBean.setOverview(plotSynopsis);
                 objMovieBean.setTrailerList(ArrListTrailers);
+                objMovieBean.setReviewlist(ArrListReviews);
 
                 Log.v(FetchMovieDetailTask.class.getName(), "IN PARSER-> "+objMovieBean.getRelease_date());
 
@@ -427,7 +565,7 @@ public class MovieDetailActivityFragment extends Fragment {
         @Override
         public View getView(int position, View view, ViewGroup parent) {
             Integer it=position;
-            Log.v("getView Called",it.toString() );
+            Log.v("getView Called", it.toString());
             LayoutInflater inflater = context.getLayoutInflater();
             View rowView= inflater.inflate(R.layout.detail_fragment_trailer_listview, null, true);
 
@@ -498,6 +636,151 @@ public class MovieDetailActivityFragment extends Fragment {
         return tempMovie;
 
     }
+
+    public void startVideo(String id){
+        try{
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+            startActivity(intent);
+            }catch (ActivityNotFoundException ex)
+            {
+            Intent intent=new Intent(Intent.ACTION_VIEW,
+            Uri.parse("http://www.youtube.com/watch?v="+id));
+            startActivity(intent);
+            }
+    }
+
+
+    public void removefromSharedPrefrence(MovieBean objMovie) {
+        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+        objBlank.add(new MovieBean());
+
+
+
+        Log.e("removefromSharedPre->",objMovie.getTitle());
+
+        Gson gson = new Gson();
+
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
+
+
+        String jsonMovieArrayList;
+        jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
+        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+
+        int counter=0;
+        for(MovieBean objMovieBean:objSharedPref)
+        {
+           if(Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId()))) {
+               Log.e("to removd", objMovieBean.getTitle());
+               Log.e("counter->", Integer.toString(counter));
+               Log.e("value removed->", objSharedPref.get(counter).getTitle().toString());
+               objSharedPref.remove(counter);
+               break;
+           }
+            counter++;
+        }
+
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(SHARED_PREFS_FILE2, gson.toJson(objSharedPref));
+
+        editor.commit();
+
+        for (MovieBean objMovieBean:objSharedPref)
+        {
+            Log.e("Gson data", objMovieBean.getTitle());
+        }
+
+
+
+    }
+
+    //removefromSharedPrefrence
+
+    public void addInSharedPrefrence(MovieBean objMovie) {
+        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+        MovieBean dummyData= new MovieBean();
+        dummyData.setTitle("Discard");
+        objBlank.add(0,dummyData);
+
+
+
+        Log.e("addInSharedPre->",objMovie.getTitle());
+
+        Gson gson = new Gson();
+
+
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
+        String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+      //  String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE_NEW, "Default value picked");
+        Log.e("json set->", gson.toJson(objBlank));
+        Log.e("json ret->", jsonMovieArrayList);
+
+        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
+        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+
+        for (MovieBean objMovieBean:objSharedPref)
+        {
+            Log.e("Title data->", objMovieBean.toString());
+            Log.e("Title data->", objMovieBean.getTitle());
+        }
+
+        if(objSharedPref.get(0).getTitle().equalsIgnoreCase("Discard"))
+        {
+            objSharedPref.remove(objSharedPref.get(0));
+        }
+        objSharedPref.add(objMovie);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(SHARED_PREFS_FILE2, gson.toJson(objSharedPref));
+
+        editor.commit();
+
+        for (MovieBean objMovieBean:objSharedPref)
+        {
+            Log.e("Gson data", objMovieBean.getTitle());
+        }
+
+
+
+    }
+
+
+    public boolean checkInSharedPrefrence(MovieBean objMovie) {
+
+        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+        objBlank.add(new MovieBean());
+
+        Log.e("checkInSharedPre->",objMovie.getTitle());
+
+        Gson gson = new Gson();
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
+
+
+        String jsonMovieArrayList;
+        jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
+        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+
+        boolean InSharedPrefrence=false;
+        for(MovieBean objMovieBean:objSharedPref)
+        {
+            if(Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId())))
+            {   Log.e("Checking array",Boolean.toString(InSharedPrefrence));
+                InSharedPrefrence=true;
+                break;
+            }
+        }
+        Log.e("checkInSharedPre->","FoundORnot"+Boolean.toString(InSharedPrefrence));
+
+        return InSharedPrefrence;
+
+    }
+
 
 
 }

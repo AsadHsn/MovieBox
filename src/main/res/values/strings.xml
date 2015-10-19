@@ -10,7 +10,10 @@
     <string-array name="sort_options_array">
         <item>Most Popular</item>
         <item>Highest Rated</item>
+        <item>Favourite list</item>
     </string-array>
     <string name="title_activity_movie_detail">Movie Details</string>
+    <string name="title_activity_review_detail">ReviewDetail</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

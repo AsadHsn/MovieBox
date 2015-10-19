@@ -3,6 +3,7 @@ package com.example.nid.moviebox;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -21,6 +22,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -31,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,11 +48,13 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     List<MovieBean> objArrListMovieBean;
     InnerImageArrayAdapter  mCustomMovieAdapter;
-    String sortCriteriaSelected="Popularity";
+    String sortCriteriaSelected="Most Popular";
     String SORT_SELECTION="SORT";
     String GRID_INDEX="GRID";
     int indexValue;
     GridView gridview;
+    String SHARED_PREFS_FILE="MovieF";
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE2";
 
 
 
@@ -61,14 +67,9 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
         // An item was selected. You can retrieve the selected item using
-        Log.v(MainActivityFragment.class.getSimpleName()+"Yipee", parent.getItemAtPosition(pos).toString());
+        Log.v(MainActivityFragment.class.getSimpleName() + "Yipee", parent.getItemAtPosition(pos).toString());
 
-
-        sortCriteriaSelected=parent.getItemAtPosition(pos).toString();
-
-        FetchMovieTask fetchMovierTaskForSpinner = new FetchMovieTask();
-
-        fetchMovierTaskForSpinner.execute(parent.getItemAtPosition(pos).toString());
+        fetchCorrectDataForSpinner(parent.getItemAtPosition(pos).toString());
 
     }
 
@@ -122,10 +123,23 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
                 Intent IntentMovieDetailActivity = new Intent(getActivity(), MovieDetailActivity.class);
 
+                if(mCustomMovieAdapter.getItem(position).getTrailerList()!=null || mCustomMovieAdapter.getItem(position).getReviewlist()!=null)
+                {
+                    MovieBean objMbean= mCustomMovieAdapter.getItem(position);
+                    objMbean.setTrailerList(null);
+                    objMbean.setReviewlist(null);
 
-                IntentMovieDetailActivity.putExtra("MOVIEBEAN", (MovieBean) mCustomMovieAdapter.getItem(position));
+                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", objMbean);
 
-                startActivity(IntentMovieDetailActivity);
+                    startActivity(IntentMovieDetailActivity);
+
+                }
+                else {
+
+                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", (MovieBean) mCustomMovieAdapter.getItem(position));
+
+                    startActivity(IntentMovieDetailActivity);
+                }
 
             }
 
@@ -139,16 +153,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public boolean onOptionsItemSelected(MenuItem item) {
 
 
-        int id=item.getItemId();
-
-        //     if(id==R.id.action_refresh)
-        //    {
-
-
-        updateMovie();
-
-        //    }
-
 
         return  super.onOptionsItemSelected(item);
     }
@@ -156,7 +160,12 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onStart() {
         super.onStart();
-        updateMovie();
+
+        Log.e("onStart called", "onstart");
+
+        fetchCorrectDataForSpinner(sortCriteriaSelected);
+
+
     }
 
 
@@ -522,19 +531,21 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         super.onSaveInstanceState(savedInstanceState);
 
         //Save the fragment's state here
+        Log.e("onSaveInstanceS->","in onSaveInstanceState");
         indexValue=gridview.getFirstVisiblePosition();
 
-        savedInstanceState.putString(SORT_SELECTION,sortCriteriaSelected);
+        savedInstanceState.putString(SORT_SELECTION, sortCriteriaSelected);
         savedInstanceState.putInt(GRID_INDEX, indexValue);
-
 
 
     }
 
+
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.v("onActivityCreated","haha");
+        Log.v("onActivityCreated", "haha");
 
         if (savedInstanceState != null) {
             sortCriteriaSelected=savedInstanceState.getString(SORT_SELECTION);
@@ -543,7 +554,56 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             Log.v("onActivityCreated",Integer.toString(indexValue));
 
         }
+
+
+
+
     }
+
+
+
+    public void fetchCorrectDataForSpinner(String SortCriteria)
+    {
+
+        sortCriteriaSelected=SortCriteria;
+
+        if(SortCriteria.equalsIgnoreCase("Favourite list"))
+        {
+            //fetch from shared preference
+            Gson gson = new Gson();
+            ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+            objBlank.add(new MovieBean());
+
+            SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
+            String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+            Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
+            ArrayList<MovieBean>  objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+
+            mCustomMovieAdapter.clear();
+            mCustomMovieAdapter.addAll(objSharedPref);
+            mCustomMovieAdapter.notifyDataSetChanged();
+
+        }
+        else
+        {
+
+            //fetch by API call
+            FetchMovieTask fetchMovierTaskForSpinner = new FetchMovieTask();
+            fetchMovierTaskForSpinner.execute(SortCriteria);
+
+        }
+
+
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.e("onViewStateRestored", "onViewStateRestored");
+        if(savedInstanceState!=null)
+        Log.e("savedInstanceState",savedInstanceState.toString());
+    }
+
 
 
 }

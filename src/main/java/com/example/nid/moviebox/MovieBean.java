@@ -18,9 +18,20 @@ public class MovieBean implements Serializable {
     String poster_path ;
     float popularity ;
     String title ;
+    boolean isFavourite=false;
+
+    public boolean isFavourite() {
+        return isFavourite;
+    }
+
+    public void setIsFavourite(boolean isFavourite) {
+        this.isFavourite = isFavourite;
+    }
+
     boolean video ;
     float vote_average ;
     int vote_count ;
+
 
     public int getId() {
         return id;
@@ -35,9 +46,15 @@ public class MovieBean implements Serializable {
 
     List<Trailer> trailerList;
 
+    List<Review> reviewlist;
 
+    public List<Review> getReviewlist() {
+        return reviewlist;
+    }
 
-
+    public void setReviewlist(List<Review> reviewlist) {
+        this.reviewlist = reviewlist;
+    }
 
     public List<Trailer> getTrailerList() {
         return trailerList;
