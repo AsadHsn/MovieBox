@@ -50,11 +50,13 @@ public class MovieDetailActivityFragment extends Fragment {
 
     TrailerList TrailerListAdapterObject;
 
-    String SHARED_PREFS_FILE="MovieF";
+    String SHARED_PREFS_FILE = "MovieF";
 
-    String SHARED_PREFS_FILE_NEW="SHARED_PREFS_FILE_NEW";
+    String SHARED_PREFS_FILE_NEW = "SHARED_PREFS_FILE_NEW";
 
-    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE2";
+    String SHARED_PREFS_FILE2 = "SHARED_PREFS_FILE2";
+
+    String MOVIE_ID = "MOVIE_ID";
 
     public MovieDetailActivityFragment() {
     }
@@ -82,9 +84,9 @@ public class MovieDetailActivityFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Intent intent=getActivity().getIntent();
+        Intent intent = getActivity().getIntent();
 
-        objIntentMovieBean=(MovieBean) intent.getSerializableExtra("MOVIEBEAN");
+        objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
         Log.v(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
 
         //To fetch the data again specially the Rating of the Movie
@@ -109,8 +111,7 @@ public class MovieDetailActivityFragment extends Fragment {
 */
     }
 
-    public void fetchMovieDetails()
-    {
+    public void fetchMovieDetails() {
 
         FetchMovieDetailTask fetchMovieDetailTask = new FetchMovieDetailTask(new FragmentCallback() {
 
@@ -128,7 +129,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private void methodThatDoesSomethingWhenTaskIsDone() {
 
-        Log.v(FetchMovieDetailTask.class.getName(), "IN methodThatDoesSomethingWhenTaskIsDone-> " );
+        Log.v(FetchMovieDetailTask.class.getName(), "IN methodThatDoesSomethingWhenTaskIsDone-> ");
 /*
         ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
 
@@ -141,13 +142,12 @@ public class MovieDetailActivityFragment extends Fragment {
 */
 
 
+        ImageView objImageView = (ImageView) getView().findViewById(R.id.image_in_detailFragment);
 
-        ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
-
-        String PosterPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getPoster_path();
-    //    PosterPathHref="http://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg";
+        String PosterPathHref = "http://image.tmdb.org/t/p/w185" + objMovieBean.getPoster_path();
+        //    PosterPathHref="http://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg";
         Log.v("PosterPath", PosterPathHref);
-      //  Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
+        //  Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
         Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
 
         TextView objTitleText = (TextView) getView().findViewById(R.id.movie_title_Highlight);
@@ -157,15 +157,14 @@ public class MovieDetailActivityFragment extends Fragment {
         objTextRelease.setText(objMovieBean.getRelease_date().substring(0, 4));
 
         TextView objTextRating = (TextView) getView().findViewById(R.id.movie_rating);
-        objTextRating.setText( Float.toString(objMovieBean.getVote_average())+"/10");
+        objTextRating.setText(Float.toString(objMovieBean.getVote_average()) + "/10");
 
         TextView objTextView = (TextView) getView().findViewById(R.id.description_detail);
         objTextView.setText(objMovieBean.getOverview());
 
 
-        Button objButton=(Button) getView().findViewById(R.id.faourite_button);
-        if(checkInSharedPrefrence(objMovieBean))
-        {
+        Button objButton = (Button) getView().findViewById(R.id.faourite_button);
+        if (checkInSharedPrefrence(objMovieBean)) {
             objButton.setBackgroundColor(Color.parseColor("#FF5722"));
         }
 
@@ -177,22 +176,15 @@ public class MovieDetailActivityFragment extends Fragment {
                 Log.e("getView====>", "Oclicklistener called Id->" + v.getId());
                 Log.e("ButtonOnclick->", Integer.toString(objMovieBean.getId()));
 
-                if(!checkInSharedPrefrence(objMovieBean))
-                {
+                if (!checkInSharedPrefrence(objMovieBean)) {
                     Log.e("addInSharedPrefrence->", Integer.toString(objMovieBean.getId()));
                     addInSharedPrefrence(objMovieBean);
                     v.setBackgroundColor(Color.parseColor("#FF5722"));
-                }
-                else
-                {
+                } else {
                     Log.e("removefromSharedPrefr->", Integer.toString(objMovieBean.getId()));
                     removefromSharedPrefrence(objMovieBean);
                     v.setBackgroundColor(Color.parseColor("#607D8B"));
                 }
-
-
-
-
 
 
             }
@@ -200,59 +192,53 @@ public class MovieDetailActivityFragment extends Fragment {
 
         });
 
-        LinearLayout layout = (LinearLayout)getView().findViewById(R.id.trailer_images_filler);
+        LinearLayout layout = (LinearLayout) getView().findViewById(R.id.trailer_images_filler);
         layout.removeAllViewsInLayout();
 
-            int counter=0;
+        int counter = 0;
 
-            for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
+        for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
 
-                Log.v("getView====>",valueTrailer.getTrailername());
-                Log.v("getView====>", valueTrailer.getSource());
+            Log.v("getView====>", valueTrailer.getTrailername());
+            Log.v("getView====>", valueTrailer.getSource());
 
-                ImageView image = new ImageView(getActivity());
-           //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
-                Picasso.with(getActivity()).load(PosterPathHref).into(image);
-              //  image.setBackgroundResource(R.drawable.martianposter);
-                image.setId(counter);
-                image.setTag(valueTrailer.getSource());
-                layout.addView(image);
-                counter++;
-
-
-                image.setOnClickListener(new ImageView.OnClickListener() {
-
-                    public void onClick(View v) {
-
-                        //to be added
-                        Log.v("getView====>", "Oclicklistener called Id->"+v.getId());
-                        startVideo((String)v.getTag());
-
-                    }
+            ImageView image = new ImageView(getActivity());
+            //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
+            Picasso.with(getActivity()).load(PosterPathHref).into(image);
+            //  image.setBackgroundResource(R.drawable.martianposter);
+            image.setId(counter);
+            image.setTag(valueTrailer.getSource());
+            layout.addView(image);
+            counter++;
 
 
-                });
+            image.setOnClickListener(new ImageView.OnClickListener() {
 
-            }
+                public void onClick(View v) {
 
-        TextView objTextviewReview = (TextView)getView().findViewById(R.id.description_Review);
-        objTextviewReview.setLines(9);
-        try
-        {
-            objTextviewReview.setText(objMovieBean.getReviewlist().get(0).getContent());
+                    //to be added
+                    Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
+                    startVideo((String) v.getTag());
+
+                }
+
+
+            });
+
         }
-        catch (Exception e)
-        {
+
+        TextView objTextviewReview = (TextView) getView().findViewById(R.id.description_Review);
+        objTextviewReview.setLines(9);
+        try {
+            objTextviewReview.setText(objMovieBean.getReviewlist().get(0).getContent());
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        TextView objTextReviewAuthor = (TextView)getView().findViewById(R.id.atuhor_review);
-        try
-        {
+        TextView objTextReviewAuthor = (TextView) getView().findViewById(R.id.atuhor_review);
+        try {
             objTextReviewAuthor.setText("Review by " + objMovieBean.getReviewlist().get(0).getAuthor());
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -261,15 +247,15 @@ public class MovieDetailActivityFragment extends Fragment {
             public void onClick(View v) {
 
                 //to be added
-                Log.v("getView====>", "Review Onclicklistener called Id->"+v.getId());
+                Log.v("getView====>", "Review Onclicklistener called Id->" + v.getId());
 
-                String textData="";
+                String textData = "";
                 for (final Review valueReview : objMovieBean.getReviewlist()) {
                     // Log.v("getView====>",valueTrailer.getTrailerOrigin());
-                    Log.v("getView====>",valueReview.getAuthor());
+                    Log.v("getView====>", valueReview.getAuthor());
 
-                    textData=textData+valueReview.getContent()+"\n";
-                    textData=textData+"By "+valueReview.getAuthor()+"\n\n\n";
+                    textData = textData + valueReview.getContent() + "\n";
+                    textData = textData + "By " + valueReview.getAuthor() + "\n\n\n";
 
                 }
 
@@ -286,17 +272,11 @@ public class MovieDetailActivityFragment extends Fragment {
         });
 
 
-
-
-
     }
 
     public interface FragmentCallback {
         public void onTaskDone();
     }
-
-
-
 
 
     public class FetchMovieDetailTask extends AsyncTask<String, Void, MovieBean> {
@@ -319,40 +299,39 @@ public class MovieDetailActivityFragment extends Fragment {
             String forecastJsonStr = null;
 
 
-            MovieBean MovieBeanForId= new MovieBean();
+            MovieBean MovieBeanForId = new MovieBean();
             //Fetch Movie Id
             MovieBeanForId.setId(objIntentMovieBean.getId());
 
 
-            String apikey = getActivity().getString(R.string.api_key );
+            String apikey = getActivity().getString(R.string.api_key);
 
             //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=releases,trailers
             //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=trailers
             //http://api.themoviedb.org/3/movie/550/videos
 
             //actual URL
-           // https://www.youtube.com/watch?v=8hP9D6kZseM
+            // https://www.youtube.com/watch?v=8hP9D6kZseM
 
             try {
 
                 final String MOVIE_DETAILDB_BASE_URL =
                         "http://api.themoviedb.org/3/movie/";
                 final String API_KEY = "api_key";
-                final String APPENDTRAILER="append_to_response";
-                final String appendTrailerVaule="trailers,reviews";
+                final String APPENDTRAILER = "append_to_response";
+                final String appendTrailerVaule = "trailers,reviews";
 
-               int Movieid= MovieBeanForId.getId();
+                int Movieid = MovieBeanForId.getId();
                 Log.v(MovieDetailActivityFragment.class.getSimpleName(), Integer.toString(MovieBeanForId.getId()));
 
 
                 Uri builtUri = Uri.parse(MOVIE_DETAILDB_BASE_URL + Integer.toString(Movieid) + "?").buildUpon()
                         .appendQueryParameter(API_KEY, apikey)
-                        .appendQueryParameter(APPENDTRAILER,appendTrailerVaule)
+                        .appendQueryParameter(APPENDTRAILER, appendTrailerVaule)
                         .build();
 
                 URL url = new URL(builtUri.toString());
                 Log.v(FetchMovieDetailTask.class.getSimpleName(), "Tag 333 ->" + builtUri.toString());
-
 
 
                 // Create the request to OpenWeatherMap, and open the connection
@@ -365,12 +344,10 @@ public class MovieDetailActivityFragment extends Fragment {
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
                     // Nothing to do.
-                    Log.v(FetchMovieDetailTask.class.getSimpleName(),"Inside NULL return buffer");
+                    Log.v(FetchMovieDetailTask.class.getSimpleName(), "Inside NULL return buffer");
                     return null;
-                }
-                else
-                {
-                    Log.v(FetchMovieDetailTask.class.getSimpleName(),"Inside NULL ELSE buffer");
+                } else {
+                    Log.v(FetchMovieDetailTask.class.getSimpleName(), "Inside NULL ELSE buffer");
                 }
                 reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -385,12 +362,12 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 if (buffer.length() == 0) {
                     // Stream was empty.  No point in parsing.
-                    Log.v(FetchMovieDetailTask.class.getSimpleName(),"Inside NULL buffer buffer");
+                    Log.v(FetchMovieDetailTask.class.getSimpleName(), "Inside NULL buffer buffer");
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
-                Log.v(FetchMovieDetailTask.class.getSimpleName() ,forecastJsonStr);
-                Log.v(FetchMovieDetailTask.class.getName() ,forecastJsonStr);
+                Log.v(FetchMovieDetailTask.class.getSimpleName(), forecastJsonStr);
+                Log.v(FetchMovieDetailTask.class.getName(), forecastJsonStr);
             } catch (IOException e) {
                 Log.e("FetchWeatherTask 1", "Error ", e);
                 // Log.v("Fetch IOException", "Error ", e);
@@ -411,23 +388,19 @@ public class MovieDetailActivityFragment extends Fragment {
                 }
             }
 
-            try
-            {
+            try {
                 return MovieDetailParser(forecastJsonStr);
                 //   return "test";
 
-            }
-            catch (Exception e)
-            {
-                Log.e("exception in JSON","sdf",e);
+            } catch (Exception e) {
+                Log.e("exception in JSON", "sdf", e);
             }
             return null;
 
         }
 
-        public MovieBean MovieDetailParser(String JsonStr)
-        {
-             new MovieBean();
+        public MovieBean MovieDetailParser(String JsonStr) {
+            new MovieBean();
 
             try {
 
@@ -435,7 +408,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 JSONObject jsonBaseObject = new JSONObject(JsonStr);
                 String title = jsonBaseObject.getString("title");
-                int Mid=Integer.parseInt(jsonBaseObject.optString("id"));
+                int Mid = Integer.parseInt(jsonBaseObject.optString("id"));
                 String relasedate = jsonBaseObject.getString("release_date");
                 String movieposter = jsonBaseObject.getString("poster_path");
                 String backdrop = jsonBaseObject.getString("backdrop_path");
@@ -443,14 +416,13 @@ public class MovieDetailActivityFragment extends Fragment {
                 String plotSynopsis = jsonBaseObject.getString("overview");
 
                 JSONObject jsonObjectTrailer = jsonBaseObject.getJSONObject("trailers");
-                JSONArray jsonArrayTrailerYoutube=jsonObjectTrailer.getJSONArray("youtube");
+                JSONArray jsonArrayTrailerYoutube = jsonObjectTrailer.getJSONArray("youtube");
 
 
-                List<Trailer> ArrListTrailers= new ArrayList<Trailer>();
+                List<Trailer> ArrListTrailers = new ArrayList<Trailer>();
 
 
-
-                for(int j=0; j < jsonArrayTrailerYoutube.length(); j++){
+                for (int j = 0; j < jsonArrayTrailerYoutube.length(); j++) {
 
                     JSONObject jsonObjectTrailerData = jsonArrayTrailerYoutube.getJSONObject(j);
 
@@ -460,24 +432,24 @@ public class MovieDetailActivityFragment extends Fragment {
                     String source = jsonObjectTrailerData.getString("source");
                     String type = jsonObjectTrailerData.getString("type");
 
-                    Trailer TrailerObject=new Trailer();
+                    Trailer TrailerObject = new Trailer();
                     TrailerObject.setTrailerOrigin(trailerOrigin);
                     TrailerObject.setTrailername(trailername);
                     TrailerObject.setSize(size);
                     TrailerObject.setSource(source);
                     TrailerObject.setType(type);
 
-                    Log.v(FetchMovieDetailTask.class.getName(), "Trailer-> " + TrailerObject.getSource()+TrailerObject.getTrailername());
+                    Log.v(FetchMovieDetailTask.class.getName(), "Trailer-> " + TrailerObject.getSource() + TrailerObject.getTrailername());
 
                     ArrListTrailers.add(j, TrailerObject);
 
                 }
 
                 JSONObject jsonObjectReview = jsonBaseObject.getJSONObject("reviews");
-                JSONArray jsonArrayReviews=jsonObjectReview.getJSONArray("results");
+                JSONArray jsonArrayReviews = jsonObjectReview.getJSONArray("results");
 
-                List<Review> ArrListReviews= new ArrayList<Review>();
-                for(int j=0; j < jsonArrayReviews.length(); j++) {
+                List<Review> ArrListReviews = new ArrayList<>();
+                for (int j = 0; j < jsonArrayReviews.length(); j++) {
 
                     JSONObject jsonObjectReviewData = jsonArrayReviews.getJSONObject(j);
 
@@ -495,13 +467,12 @@ public class MovieDetailActivityFragment extends Fragment {
                     Log.v(FetchMovieDetailTask.class.getName(), "Review-> " + objReview.getAuthor() + objReview.getContent());
 
 
-                    ArrListReviews.add(j,objReview);
+                    ArrListReviews.add(j, objReview);
 
                 }
 
 
-
-                objMovieBean=new MovieBean();
+                objMovieBean = new MovieBean();
 
                 objMovieBean.setTitle(title);
                 objMovieBean.setId(Mid);
@@ -513,13 +484,11 @@ public class MovieDetailActivityFragment extends Fragment {
                 objMovieBean.setTrailerList(ArrListTrailers);
                 objMovieBean.setReviewlist(ArrListReviews);
 
-                Log.v(FetchMovieDetailTask.class.getName(), "IN PARSER-> "+objMovieBean.getRelease_date());
-
-
+                Log.v(FetchMovieDetailTask.class.getName(), "IN PARSER-> " + objMovieBean.getRelease_date());
 
 
             } catch (JSONException e) {
-            // TODO Auto-generated catch block
+                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -534,7 +503,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 //Load Image and other details
                 mFragmentCallback.onTaskDone();
 
-                Log.v(FetchMovieDetailTask.class.getName(), "ON POST EXECUTE-> " );
+                Log.v(FetchMovieDetailTask.class.getName(), "ON POST EXECUTE-> ");
 
 
             }
@@ -548,15 +517,15 @@ public class MovieDetailActivityFragment extends Fragment {
 
         private final Activity context;
         public ArrayList<MovieBean> adapterData;
-     //   private final Integer[] imageId;
+        //   private final Integer[] imageId;
 
-        public TrailerList(Activity context,ArrayList<MovieBean> web, int resource) {
+        public TrailerList(Activity context, ArrayList<MovieBean> web, int resource) {
             super(context, R.layout.detail_fragment_trailer_listview, web);
 
 
             this.adapterData = web;
             this.context = context;
-         //   this.imageId = imageId;
+            //   this.imageId = imageId;
 
 
         }
@@ -564,35 +533,33 @@ public class MovieDetailActivityFragment extends Fragment {
 
         @Override
         public View getView(int position, View view, ViewGroup parent) {
-            Integer it=position;
+            Integer it = position;
             Log.v("getView Called", it.toString());
             LayoutInflater inflater = context.getLayoutInflater();
-            View rowView= inflater.inflate(R.layout.detail_fragment_trailer_listview, null, true);
+            View rowView = inflater.inflate(R.layout.detail_fragment_trailer_listview, null, true);
 
             TextView txtTitle = (TextView) rowView.findViewById(R.id.list_item_trailer_name);
 
             for (final MovieBean value : adapterData) {
-             //   Log.v("getView====>",value.getArtistName());
-                Integer iy=adapterData.size();
+                //   Log.v("getView====>",value.getArtistName());
+                Integer iy = adapterData.size();
                 Log.v("Shouldbe1=>", iy.toString());
 
                 for (final Trailer valueTrailer : value.getTrailerList()) {
-                   // Log.v("getView====>",valueTrailer.getTrailerOrigin());
-                    Log.v("getView====>",valueTrailer.getTrailername());
+                    // Log.v("getView====>",valueTrailer.getTrailerOrigin());
+                    Log.v("getView====>", valueTrailer.getTrailername());
 
                 }
             }
 
 
-
-                //Data is withing Moviebean Arraylist and then in Trailer arraylist, however moviebean is of size 1
+            //Data is withing Moviebean Arraylist and then in Trailer arraylist, however moviebean is of size 1
             txtTitle.setText(adapterData.get(0).getTrailerList().get(position).getTrailername());
 
-           ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_image);
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.list_item_image);
 
             //this has to be updated to play button image later on
             Picasso.with(context).load("http://image.tmdb.org/t/p/w500/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg").into(imageView);
-
 
 
             return rowView;
@@ -600,19 +567,18 @@ public class MovieDetailActivityFragment extends Fragment {
 
         @Override
         public int getCount() {
-              Log.v("getCount Called",Integer.toString( adapterData.get(0).getTrailerList().size()));
+            Log.v("getCount Called", Integer.toString(adapterData.get(0).getTrailerList().size()));
             return adapterData.get(0).getTrailerList().size();
 
             //  return super.getCount();
         }
 
 
-
     }
 
     private ArrayList<MovieBean> populateTrailerDummyData() {
 
-        MovieBean objMovieBean= new MovieBean();
+        MovieBean objMovieBean = new MovieBean();
 
         ArrayList<MovieBean> tempMovie = new ArrayList<MovieBean>();
 
@@ -621,14 +587,13 @@ public class MovieDetailActivityFragment extends Fragment {
 
         Trailer objTrailer = new Trailer();
         objTrailer.setTrailername("Test Trailer 1");
-        tempTrailer.add(0,objTrailer);
+        tempTrailer.add(0, objTrailer);
         objTrailer.setTrailername("Test Trailer 2");
-        tempTrailer.add(1,objTrailer);
+        tempTrailer.add(1, objTrailer);
         objTrailer.setTrailername("Test Trailer 3");
-        tempTrailer.add(2,objTrailer);
+        tempTrailer.add(2, objTrailer);
 
         objMovieBean.setTrailerList(tempTrailer);
-
 
 
         tempMovie.add(objMovieBean);
@@ -637,27 +602,25 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
-    public void startVideo(String id){
-        try{
+    public void startVideo(String id) {
+        try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
             startActivity(intent);
-            }catch (ActivityNotFoundException ex)
-            {
-            Intent intent=new Intent(Intent.ACTION_VIEW,
-            Uri.parse("http://www.youtube.com/watch?v="+id));
+        } catch (ActivityNotFoundException ex) {
+            Intent intent = new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://www.youtube.com/watch?v=" + id));
             startActivity(intent);
-            }
+        }
     }
 
 
     public void removefromSharedPrefrence(MovieBean objMovie) {
-        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
-        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
         objBlank.add(new MovieBean());
 
 
-
-        Log.e("removefromSharedPre->",objMovie.getTitle());
+        Log.e("removefromSharedPre->", objMovie.getTitle());
 
         Gson gson = new Gson();
 
@@ -666,20 +629,20 @@ public class MovieDetailActivityFragment extends Fragment {
 
 
         String jsonMovieArrayList;
-        jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
-        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
-        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+        jsonMovieArrayList = sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        Type type = new TypeToken<ArrayList<MovieBean>>() {
+        }.getType();
+        objSharedPref = gson.fromJson(jsonMovieArrayList, type);
 
-        int counter=0;
-        for(MovieBean objMovieBean:objSharedPref)
-        {
-           if(Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId()))) {
-               Log.e("to removd", objMovieBean.getTitle());
-               Log.e("counter->", Integer.toString(counter));
-               Log.e("value removed->", objSharedPref.get(counter).getTitle().toString());
-               objSharedPref.remove(counter);
-               break;
-           }
+        int counter = 0;
+        for (MovieBean objMovieBean : objSharedPref) {
+            if (Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId()))) {
+                Log.e("to removd", objMovieBean.getTitle());
+                Log.e("counter->", Integer.toString(counter));
+                Log.e("value removed->", objSharedPref.get(counter).getTitle().toString());
+                objSharedPref.remove(counter);
+                break;
+            }
             counter++;
         }
 
@@ -689,11 +652,9 @@ public class MovieDetailActivityFragment extends Fragment {
 
         editor.commit();
 
-        for (MovieBean objMovieBean:objSharedPref)
-        {
+        for (MovieBean objMovieBean : objSharedPref) {
             Log.e("Gson data", objMovieBean.getTitle());
         }
-
 
 
     }
@@ -701,36 +662,34 @@ public class MovieDetailActivityFragment extends Fragment {
     //removefromSharedPrefrence
 
     public void addInSharedPrefrence(MovieBean objMovie) {
-        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
-        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
-        MovieBean dummyData= new MovieBean();
+        ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
+        MovieBean dummyData = new MovieBean();
         dummyData.setTitle("Discard");
-        objBlank.add(0,dummyData);
+        objBlank.add(0, dummyData);
 
 
-
-        Log.e("addInSharedPre->",objMovie.getTitle());
+        Log.e("addInSharedPre->", objMovie.getTitle());
 
         Gson gson = new Gson();
 
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
-        String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
-      //  String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE_NEW, "Default value picked");
+        String jsonMovieArrayList = sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        //  String jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE_NEW, "Default value picked");
         Log.e("json set->", gson.toJson(objBlank));
         Log.e("json ret->", jsonMovieArrayList);
 
-        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
-        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+        Type type = new TypeToken<ArrayList<MovieBean>>() {
+        }.getType();
+        objSharedPref = gson.fromJson(jsonMovieArrayList, type);
 
-        for (MovieBean objMovieBean:objSharedPref)
-        {
+        for (MovieBean objMovieBean : objSharedPref) {
             Log.e("Title data->", objMovieBean.toString());
             Log.e("Title data->", objMovieBean.getTitle());
         }
 
-        if(objSharedPref.get(0).getTitle().equalsIgnoreCase("Discard"))
-        {
+        if (objSharedPref.get(0).getTitle().equalsIgnoreCase("Discard")) {
             objSharedPref.remove(objSharedPref.get(0));
         }
         objSharedPref.add(objMovie);
@@ -739,11 +698,9 @@ public class MovieDetailActivityFragment extends Fragment {
 
         editor.commit();
 
-        for (MovieBean objMovieBean:objSharedPref)
-        {
+        for (MovieBean objMovieBean : objSharedPref) {
             Log.e("Gson data", objMovieBean.getTitle());
         }
-
 
 
     }
@@ -751,36 +708,64 @@ public class MovieDetailActivityFragment extends Fragment {
 
     public boolean checkInSharedPrefrence(MovieBean objMovie) {
 
-        ArrayList<MovieBean> objSharedPref= new ArrayList<MovieBean>();
-        ArrayList<MovieBean> objBlank= new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
+        ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
         objBlank.add(new MovieBean());
 
-        Log.e("checkInSharedPre->",objMovie.getTitle());
+        Log.e("checkInSharedPre->", objMovie.getTitle());
 
         Gson gson = new Gson();
         SharedPreferences sharedPref = getActivity().getSharedPreferences(SHARED_PREFS_FILE2, Context.MODE_PRIVATE);
 
 
         String jsonMovieArrayList;
-        jsonMovieArrayList=sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
-        Type type = new TypeToken<ArrayList<MovieBean>>(){}.getType();
-        objSharedPref =gson.fromJson(jsonMovieArrayList, type);
+        jsonMovieArrayList = sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        Type type = new TypeToken<ArrayList<MovieBean>>() {
+        }.getType();
+        objSharedPref = gson.fromJson(jsonMovieArrayList, type);
 
-        boolean InSharedPrefrence=false;
-        for(MovieBean objMovieBean:objSharedPref)
-        {
-            if(Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId())))
-            {   Log.e("Checking array",Boolean.toString(InSharedPrefrence));
-                InSharedPrefrence=true;
+        boolean InSharedPrefrence = false;
+        for (MovieBean objMovieBean : objSharedPref) {
+            if (Integer.toString(objMovieBean.getId()).equalsIgnoreCase(Integer.toString(objMovie.getId()))) {
+                Log.e("Checking array", Boolean.toString(InSharedPrefrence));
+                InSharedPrefrence = true;
                 break;
             }
         }
-        Log.e("checkInSharedPre->","FoundORnot"+Boolean.toString(InSharedPrefrence));
+        Log.e("checkInSharedPre->", "FoundORnot" + Boolean.toString(InSharedPrefrence));
 
         return InSharedPrefrence;
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        //Save the fragment's state here
+        Log.e("onSaveIns DetailFrag->", "in onSaveInstanceState");
+
+        if (objIntentMovieBean != null) {
+            savedInstanceState.putInt(MOVIE_ID, objIntentMovieBean.getId());
+        }
 
 
+    }
+
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.v("onActivityC frag2", "haha");
+
+        if (savedInstanceState != null) {
+            objIntentMovieBean=new MovieBean();
+            objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
+            Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
+
+
+        }
+
+
+    }
 }
