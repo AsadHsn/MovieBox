@@ -53,29 +53,10 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     String GRID_INDEX="GRID";
     int indexValue;
     GridView gridview;
-    String SHARED_PREFS_FILE="MovieF";
-    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE2";
-
-
-
-
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE3";
 
 
     public MainActivityFragment() {
-    }
-
-    public void onItemSelected(AdapterView<?> parent, View view,
-                               int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        Log.v(MainActivityFragment.class.getSimpleName() + "Yipee", parent.getItemAtPosition(pos).toString());
-
-        fetchCorrectDataForSpinner(parent.getItemAtPosition(pos).toString());
-
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-        Log.v(MainActivityFragment.class.getSimpleName(), "NOTHING Selected");
     }
 
     @Override
@@ -150,6 +131,25 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.v("onActivityCreated", "haha");
+
+        if (savedInstanceState != null) {
+            sortCriteriaSelected=savedInstanceState.getString(SORT_SELECTION);
+            indexValue=savedInstanceState.getInt(GRID_INDEX);
+            Log.v("onActivityCreated",sortCriteriaSelected);
+            Log.v("onActivityCreated",Integer.toString(indexValue));
+
+        }
+
+
+
+
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
 
@@ -166,6 +166,43 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         fetchCorrectDataForSpinner(sortCriteriaSelected);
 
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        //Save the fragment's state here
+        Log.e("onSaveInstanceS->","in onSaveInstanceState");
+        indexValue=gridview.getFirstVisiblePosition();
+
+        savedInstanceState.putString(SORT_SELECTION, sortCriteriaSelected);
+        savedInstanceState.putInt(GRID_INDEX, indexValue);
+
+
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.e("onViewStateRestored", "onViewStateRestored");
+        if(savedInstanceState!=null)
+            Log.e("savedInstanceState",savedInstanceState.toString());
+    }
+
+
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        Log.v(MainActivityFragment.class.getSimpleName() + "Yipee", parent.getItemAtPosition(pos).toString());
+
+        fetchCorrectDataForSpinner(parent.getItemAtPosition(pos).toString());
+
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+        Log.v(MainActivityFragment.class.getSimpleName(), "NOTHING Selected");
     }
 
 
@@ -526,41 +563,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        //Save the fragment's state here
-        Log.e("onSaveInstanceS->","in onSaveInstanceState");
-        indexValue=gridview.getFirstVisiblePosition();
-
-        savedInstanceState.putString(SORT_SELECTION, sortCriteriaSelected);
-        savedInstanceState.putInt(GRID_INDEX, indexValue);
-
-
-    }
-
-
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.v("onActivityCreated", "haha");
-
-        if (savedInstanceState != null) {
-            sortCriteriaSelected=savedInstanceState.getString(SORT_SELECTION);
-            indexValue=savedInstanceState.getInt(GRID_INDEX);
-            Log.v("onActivityCreated",sortCriteriaSelected);
-            Log.v("onActivityCreated",Integer.toString(indexValue));
-
-        }
-
-
-
-
-    }
-
-
 
     public void fetchCorrectDataForSpinner(String SortCriteria)
     {
@@ -594,14 +596,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         }
 
 
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        Log.e("onViewStateRestored", "onViewStateRestored");
-        if(savedInstanceState!=null)
-        Log.e("savedInstanceState",savedInstanceState.toString());
     }
 
 

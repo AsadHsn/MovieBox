@@ -45,18 +45,11 @@ import java.util.List;
 public class MovieDetailActivityFragment extends Fragment {
 
     MovieBean objMovieBean;
-
     MovieBean objIntentMovieBean;
-
     TrailerList TrailerListAdapterObject;
-
-    String SHARED_PREFS_FILE = "MovieF";
-
-    String SHARED_PREFS_FILE_NEW = "SHARED_PREFS_FILE_NEW";
-
-    String SHARED_PREFS_FILE2 = "SHARED_PREFS_FILE2";
-
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE3";
     String MOVIE_ID = "MOVIE_ID";
+
 
     public MovieDetailActivityFragment() {
     }
@@ -87,7 +80,8 @@ public class MovieDetailActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
 
         objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
-        Log.v(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
+        Log.e("onStart","onStart");
+        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
 
         //To fetch the data again specially the Rating of the Movie
         fetchMovieDetails();
@@ -110,6 +104,37 @@ public class MovieDetailActivityFragment extends Fragment {
         objTextView.setText("Synopsis: \n"+objIntentMovieBean.getOverview());
 */
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.e("onActivityC frag2", "haha");
+
+        if (savedInstanceState != null) {
+            objIntentMovieBean=new MovieBean();
+            objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
+            Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
+
+
+        }
+
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        //Save the fragment's state here
+        Log.e("onSaveIns DetailFrag->", "in onSaveInstanceState");
+
+        if (objIntentMovieBean != null) {
+            savedInstanceState.putInt(MOVIE_ID, objIntentMovieBean.getId());
+        }
+
+
+    }
+
 
     public void fetchMovieDetails() {
 
@@ -659,7 +684,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
-    //removefromSharedPrefrence
 
     public void addInSharedPrefrence(MovieBean objMovie) {
         ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
@@ -738,34 +762,7 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-
-        //Save the fragment's state here
-        Log.e("onSaveIns DetailFrag->", "in onSaveInstanceState");
-
-        if (objIntentMovieBean != null) {
-            savedInstanceState.putInt(MOVIE_ID, objIntentMovieBean.getId());
-        }
 
 
-    }
 
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.v("onActivityC frag2", "haha");
-
-        if (savedInstanceState != null) {
-            objIntentMovieBean=new MovieBean();
-            objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
-            Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
-
-
-        }
-
-
-    }
 }
