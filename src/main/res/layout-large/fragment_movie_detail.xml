@@ -153,10 +153,18 @@
             android:layout_marginRight="10dp"
             android:background="#7db5b5b5"/>
 
+        <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trailer_table_view"
+            >
+
+        </TableLayout>
+
         <ListView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            android:id="@+id/trailer_listview"
+            android:layout_height="wrap_content"
+            android:id="@+id/trailer_listview">
         </ListView>
 
         <HorizontalScrollView

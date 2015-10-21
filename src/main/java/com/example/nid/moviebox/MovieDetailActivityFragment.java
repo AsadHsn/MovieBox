@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -47,11 +51,29 @@ public class MovieDetailActivityFragment extends Fragment {
     MovieBean objMovieBean;
     MovieBean objIntentMovieBean;
     TrailerList TrailerListAdapterObject;
-    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE3";
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE5";
     String MOVIE_ID = "MOVIE_ID";
+    boolean mDualPane;
 
 
     public MovieDetailActivityFragment() {
+    }
+
+    public static MovieDetailActivityFragment newInstance(int movieId) {
+        MovieDetailActivityFragment f = new MovieDetailActivityFragment();
+
+      //   objIntentMovieBean=movbean;
+        Bundle args = new Bundle();
+        args.putInt("mID", movieId);
+        f.setArguments(args);
+
+        return f;
+    }
+
+    public int getMovieId()
+    {
+
+        return getArguments().getInt("mID", 0);
     }
 
     @Override
@@ -60,15 +82,45 @@ public class MovieDetailActivityFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-//        ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
-//
-//        MovieBean objMovieBean= new MovieBean();
-//
-//        ArrayList<MovieBean> tempData = populateTrailerDummyData();
-//
-//        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
-//
-//        listview.setAdapter(TrailerListAdapterObject);
+        ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
+
+        MovieBean objMovieBean= new MovieBean();
+
+        ArrayList<MovieBean> tempData = populateTrailerDummyData();
+
+        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
+
+        listview.setAdapter(TrailerListAdapterObject);
+       Intent intent = getActivity().getIntent();
+
+        objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
+
+        // handle fragment arguments
+        Bundle arguments = getArguments();
+        if(arguments != null)
+        {
+            MovieBean obj= new MovieBean();
+            obj.setId(arguments.getInt("mID"));
+            objIntentMovieBean=obj;
+        }
+
+
+        // handle intent extras
+        Bundle extras = getActivity().getIntent().getExtras();
+        if(extras != null)
+        {
+            objIntentMovieBean=(MovieBean)getActivity().getIntent().getSerializableExtra("MOVIEBEAN");
+        }
+
+
+        if(getArguments()!=null)
+        Log.e( "Bundle Argument",Integer.toString(getArguments().getInt("mID", 0)) );
+
+        Log.e("onStart","onStart");
+//        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
+
+        //To fetch the data again specially the Rating of the Movie
+        fetchMovieDetails();
 
         return rootView;
     }
@@ -77,14 +129,14 @@ public class MovieDetailActivityFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        Intent intent = getActivity().getIntent();
+   //     Intent intent = getActivity().getIntent();
 
-        objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
-        Log.e("onStart","onStart");
-        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
-
-        //To fetch the data again specially the Rating of the Movie
-        fetchMovieDetails();
+////asad // to be removed        objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
+//        Log.e("onStart","onStart");
+////        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
+//
+//        //To fetch the data again specially the Rating of the Movie
+//        fetchMovieDetails();
 /*
         ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
 
@@ -114,9 +166,15 @@ public class MovieDetailActivityFragment extends Fragment {
             objIntentMovieBean=new MovieBean();
             objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
             Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
-
-
         }
+//        try(
+//        else if(getArguments().getInt("mID", 0)!=0)
+//        {
+//            objIntentMovieBean=new MovieBean();
+//            objIntentMovieBean.setId(getArguments().getInt("mID", 0));
+//
+//        }
+//
 
 
     }
@@ -222,10 +280,14 @@ public class MovieDetailActivityFragment extends Fragment {
 
         int counter = 0;
 
+        //asadty
+        populateTableLayout(objMovieBean);
+
         for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
 
             Log.v("getView====>", valueTrailer.getTrailername());
             Log.v("getView====>", valueTrailer.getSource());
+
 
             ImageView image = new ImageView(getActivity());
             //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
@@ -233,6 +295,7 @@ public class MovieDetailActivityFragment extends Fragment {
             //  image.setBackgroundResource(R.drawable.martianposter);
             image.setId(counter);
             image.setTag(valueTrailer.getSource());
+            image.setImageResource(R.drawable.playbutton24);
             layout.addView(image);
             counter++;
 
@@ -274,21 +337,24 @@ public class MovieDetailActivityFragment extends Fragment {
                 //to be added
                 Log.v("getView====>", "Review Onclicklistener called Id->" + v.getId());
 
-                String textData = "";
-                for (final Review valueReview : objMovieBean.getReviewlist()) {
-                    // Log.v("getView====>",valueTrailer.getTrailerOrigin());
-                    Log.v("getView====>", valueReview.getAuthor());
+//                String textData = "";
+//                for (final Review valueReview : objMovieBean.getReviewlist()) {
+//                    // Log.v("getView====>",valueTrailer.getTrailerOrigin());
+//                    Log.v("getView====>", valueReview.getAuthor());
+//
+//                    textData = textData + "\"" + valueReview.getContent() + "\"" + "\n";
+//                    textData = textData + "\n" + "By " + valueReview.getAuthor() + "\n\n\n";
+//
+//                }
+//
+//                Intent IntentReviewDetailActivity = new Intent(getActivity(), ReviewDetail.class);
+//
+//                IntentReviewDetailActivity.putExtra("REVIEW", textData);
+//
+//                startActivity(IntentReviewDetailActivity);
 
-                    textData = textData + valueReview.getContent() + "\n";
-                    textData = textData + "By " + valueReview.getAuthor() + "\n\n\n";
 
-                }
-
-                Intent IntentReviewDetailActivity = new Intent(getActivity(), ReviewDetail.class);
-
-                IntentReviewDetailActivity.putExtra("REVIEW", textData);
-
-                startActivity(IntentReviewDetailActivity);
+                showAllReviews(objMovieBean);
 
 
             }
@@ -734,7 +800,11 @@ public class MovieDetailActivityFragment extends Fragment {
 
         ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
         ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
-        objBlank.add(new MovieBean());
+        MovieBean dummyData = new MovieBean();
+        dummyData.setTitle("Discard");
+        objBlank.add(0, dummyData);
+
+
 
         Log.e("checkInSharedPre->", objMovie.getTitle());
 
@@ -744,6 +814,11 @@ public class MovieDetailActivityFragment extends Fragment {
 
         String jsonMovieArrayList;
         jsonMovieArrayList = sharedPref.getString(SHARED_PREFS_FILE2, gson.toJson(objBlank));
+        Log.e("json set->", gson.toJson(objBlank));
+        Log.e("json ret->", jsonMovieArrayList);
+
+
+
         Type type = new TypeToken<ArrayList<MovieBean>>() {
         }.getType();
         objSharedPref = gson.fromJson(jsonMovieArrayList, type);
@@ -762,7 +837,105 @@ public class MovieDetailActivityFragment extends Fragment {
 
     }
 
+    public void showAllReviews(MovieBean objMovieBean)
+    {
+
+        View detailsFrame = getActivity().findViewById(R.id.details_movie);
+        mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+
+        String textData = "";
+        for (final Review valueReview : objMovieBean.getReviewlist()) {
+            // Log.v("getView====>",valueTrailer.getTrailerOrigin());
+            Log.v("getView====>", valueReview.getAuthor());
+
+            textData = textData + "\"" + valueReview.getContent() + "\"" + "\n";
+            textData = textData + "\n" + "By " + valueReview.getAuthor() + "\n\n\n";
+
+        }
 
 
+        if(!mDualPane)
+        {
+
+            Intent IntentReviewDetailActivity = new Intent(getActivity(), ReviewDetail.class);
+            IntentReviewDetailActivity.putExtra("REVIEWACT", textData);
+            startActivity(IntentReviewDetailActivity);
+        }
+        else
+        {
+            //call listener callback method in activity
+            // mListener.onMovieSelected(objMovieBean);
+
+
+//            ReviewDetailFragment details = (ReviewDetailFragment)
+//                    getFragmentManager().findFragmentById(R.id.review_all_lay);
+//        //    if (details == null || details.getMovieId() != objMovieBean.getId()) {
+       //     if (details == null ) {
+                // Make new fragment to show this selection.
+                ReviewDetailFragment details = ReviewDetailFragment.newInstance(textData);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                if (objMovieBean.getId() == 0) {
+                    ft.replace(R.id.details_movie, details);
+                } else {
+                    ft.replace(R.id.details_movie, details);
+                }
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(null);
+                ft.commit();
+      //      }
+
+
+
+        }
+    }
+
+
+    public void populateTableLayout(MovieBean objobjMovieBean)
+    {
+        String PosterPathHref = "http://image.tmdb.org/t/p/w185" + objobjMovieBean.getPoster_path();
+
+        /* Find Tablelayout defined in main.xml */
+        TableLayout tl = (TableLayout) getActivity().findViewById(R.id.trailer_table_view);
+/* Create a new row to be added. */
+//        TableRow tr = new TableRow(getActivity());
+//        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+///* Create a Button to be the row-content. */
+//        Button b = new Button(getActivity());
+//        b.setText("Dynamic Button");
+//        b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+
+
+/* Add Button to row. */
+       //// tr.addView(b);
+/* Add row to TableLayout. */
+//tr.setBackgroundResource(R.drawable.sf_gradient_03);
+
+        TableRow tr= new TableRow(getActivity());
+
+        for (final Trailer valueTrailer : objobjMovieBean.getTrailerList()) {
+
+            tr= new TableRow(getActivity());
+            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+/* Create a Button to be the row-content. */
+
+            ImageView image = new ImageView(getActivity());
+            Picasso.with(getActivity()).load(PosterPathHref).into(image);
+            image.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            TextView objTextviewReview = new TextView(getActivity());
+            objTextviewReview.setText(valueTrailer.getTrailername());
+            objTextviewReview.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            tr.addView(image);
+            tr.addView(objTextviewReview);
+            tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+
+        }
+
+
+
+
+    }
 
 }

@@ -5,6 +5,8 @@
     <string name="hello_world3">Rating</string>
     <string name="hello_world4">Overview</string>
     <string name="action_settings">Settings</string>
+    <string name="default_review">Sorry No review found for this movie</string>
+    <string name="review_auther_prefix">By</string>
 
 
     <string-array name="sort_options_array">

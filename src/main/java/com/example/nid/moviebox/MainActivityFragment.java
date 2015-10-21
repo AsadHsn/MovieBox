@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -53,8 +54,23 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     String GRID_INDEX="GRID";
     int indexValue;
     GridView gridview;
-    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE3";
+    String SHARED_PREFS_FILE2="SHARED_PREFS_FILE5";
+    OnMovieSelectedListener mListener;
+    boolean mDualPane;
 
+    public interface OnMovieSelectedListener {
+        public void onMovieSelected(MovieBean moviebeasobj);
+    }
+
+//    @Override
+//    public void onAttach(Activity activity) {
+//        super.onAttach(activity);
+//        try {
+//            mListener = (OnMovieSelectedListener) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString() + " must implement OnMovieSelectedListener");
+//        }
+//    }
 
     public MainActivityFragment() {
     }
@@ -104,6 +120,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
                 Intent IntentMovieDetailActivity = new Intent(getActivity(), MovieDetailActivity.class);
 
+                //If the Moviebean object has been retrieved from shared prefrence than it will contain trailer and review arraylist within the Moviebean object and it will give error while passing this object with Intent extra therfore I am removing these inner arrays if present.
                 if(mCustomMovieAdapter.getItem(position).getTrailerList()!=null || mCustomMovieAdapter.getItem(position).getReviewlist()!=null)
                 {
                     MovieBean objMbean= mCustomMovieAdapter.getItem(position);
@@ -112,14 +129,17 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
                     IntentMovieDetailActivity.putExtra("MOVIEBEAN", objMbean);
 
-                    startActivity(IntentMovieDetailActivity);
+                  //  startActivity(IntentMovieDetailActivity);
+                    showMovieDetails(objMbean);
 
                 }
-                else {
+                else
+                {
 
                     IntentMovieDetailActivity.putExtra("MOVIEBEAN", (MovieBean) mCustomMovieAdapter.getItem(position));
 
-                    startActivity(IntentMovieDetailActivity);
+                  //  startActivity(IntentMovieDetailActivity);
+                    showMovieDetails((MovieBean) mCustomMovieAdapter.getItem(position));
                 }
 
             }
@@ -598,6 +618,44 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     }
 
+    public void showMovieDetails(MovieBean objMovieBean)
+    {
 
+        View detailsFrame = getActivity().findViewById(R.id.details_movie);
+        mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+
+
+        if(!mDualPane)
+        {
+
+            Intent IntentMovieDetailActivity = new Intent(getActivity(), MovieDetailActivity.class);
+            IntentMovieDetailActivity.putExtra("MOVIEBEAN", objMovieBean);
+            startActivity(IntentMovieDetailActivity);
+        }
+        else
+        {
+            //call listener callback method in activity
+           // mListener.onMovieSelected(objMovieBean);
+
+
+       //     MovieDetailActivityFragment details = (MovieDetailActivityFragment)getFragmentManager().findFragmentById(R.id.details_movie);
+     //asad       if (details == null || details.getMovieId() != objMovieBean.getId()) {
+                // Make new fragment to show this selection.
+            MovieDetailActivityFragment details = MovieDetailActivityFragment.newInstance(objMovieBean.getId());
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                if (objMovieBean.getId() == 0) {
+                    ft.replace(R.id.details_movie, details);
+                } else {
+                    ft.replace(R.id.details_movie, details);
+                }
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.addToBackStack(null);
+                ft.commit();
+       //asad     }
+
+
+
+        }
+    }
 
 }
