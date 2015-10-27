@@ -12,14 +12,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -82,15 +83,16 @@ public class MovieDetailActivityFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
+ //       ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
 
-        MovieBean objMovieBean= new MovieBean();
+ //       MovieBean objMovieBean= new MovieBean();
 
-        ArrayList<MovieBean> tempData = populateTrailerDummyData();
+//        ArrayList<MovieBean> tempData = populateTrailerDummyData();
+//
+//        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
+//
+//        listview.setAdapter(TrailerListAdapterObject);
 
-        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
-
-        listview.setAdapter(TrailerListAdapterObject);
        Intent intent = getActivity().getIntent();
 
         objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
@@ -283,37 +285,37 @@ public class MovieDetailActivityFragment extends Fragment {
         //asadty
         populateTableLayout(objMovieBean);
 
-        for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
-
-            Log.v("getView====>", valueTrailer.getTrailername());
-            Log.v("getView====>", valueTrailer.getSource());
-
-
-            ImageView image = new ImageView(getActivity());
-            //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
-            Picasso.with(getActivity()).load(PosterPathHref).into(image);
-            //  image.setBackgroundResource(R.drawable.martianposter);
-            image.setId(counter);
-            image.setTag(valueTrailer.getSource());
-            image.setImageResource(R.drawable.playbutton24);
-            layout.addView(image);
-            counter++;
-
-
-            image.setOnClickListener(new ImageView.OnClickListener() {
-
-                public void onClick(View v) {
-
-                    //to be added
-                    Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
-                    startVideo((String) v.getTag());
-
-                }
-
-
-            });
-
-        }
+//        for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
+//
+//            Log.v("getView====>", valueTrailer.getTrailername());
+//            Log.v("getView====>", valueTrailer.getSource());
+//
+//
+//            ImageView image = new ImageView(getActivity());
+//            //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
+//            Picasso.with(getActivity()).load(PosterPathHref).into(image);
+//            //  image.setBackgroundResource(R.drawable.martianposter);
+//            image.setId(counter);
+//            image.setTag(valueTrailer.getSource());
+//            image.setImageResource(R.drawable.playbutton24);
+//            layout.addView(image);
+//            counter++;
+//
+//
+//            image.setOnClickListener(new ImageView.OnClickListener() {
+//
+//                public void onClick(View v) {
+//
+//                    //to be added
+//                    Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
+//                    startVideo((String) v.getTag());
+//
+//                }
+//
+//
+//            });
+//
+//        }
 
         TextView objTextviewReview = (TextView) getView().findViewById(R.id.description_Review);
         objTextviewReview.setLines(9);
@@ -892,44 +894,80 @@ public class MovieDetailActivityFragment extends Fragment {
 
     public void populateTableLayout(MovieBean objobjMovieBean)
     {
-        String PosterPathHref = "http://image.tmdb.org/t/p/w185" + objobjMovieBean.getPoster_path();
+        String PosterPathHref = "http://image.tmdb.org/t/p/w92" + objobjMovieBean.getPoster_path();
 
-        /* Find Tablelayout defined in main.xml */
+
+
+
         TableLayout tl = (TableLayout) getActivity().findViewById(R.id.trailer_table_view);
-/* Create a new row to be added. */
-//        TableRow tr = new TableRow(getActivity());
-//        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-///* Create a Button to be the row-content. */
-//        Button b = new Button(getActivity());
-//        b.setText("Dynamic Button");
-//        b.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
-
-
-/* Add Button to row. */
-       //// tr.addView(b);
-/* Add row to TableLayout. */
-//tr.setBackgroundResource(R.drawable.sf_gradient_03);
 
         TableRow tr= new TableRow(getActivity());
+        int counter = 0;
 
         for (final Trailer valueTrailer : objobjMovieBean.getTrailerList()) {
 
+            FrameLayout ll = new FrameLayout(getActivity());
+            FrameLayout.LayoutParams layoutParamsFrame=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+         //   ll.setLayoutParams(layoutParamsFrame);
+
             tr= new TableRow(getActivity());
-            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+        //    tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
 /* Create a Button to be the row-content. */
 
             ImageView image = new ImageView(getActivity());
             Picasso.with(getActivity()).load(PosterPathHref).into(image);
-            image.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            image.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+
+            ImageView imageplay = new ImageView(getActivity());
+       //     LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,Gravity.BOTTOM|Gravity.RIGHT);
+            FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
+
+
+          //  layoutParams.gravity= Gravity.BOTTOM;
+         //   layoutParams.gravity= Gravity.RIGHT;
+         //   layoutParams.setMargins(10, 10, 10, 10);
+         //   imageplay.setBackgroundColor(Color.BLACK);
+            imageplay.setLayoutParams(layoutParams);
+            imageplay.setImageResource(R.drawable.playbuttoncircled100);
+          //  imageplay.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+
 
             TextView objTextviewReview = new TextView(getActivity());
             objTextviewReview.setText(valueTrailer.getTrailername());
-            objTextviewReview.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            objTextviewReview.setTextSize(18);
+           // objTextviewReview.setBackgroundColor(Color.BLACK);
+            objTextviewReview.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+           // objTextviewReview.setTextColor(Color.parseColor("#FF5722"));
+            objTextviewReview.setLayoutParams(new TableRow.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.FILL_PARENT));
 
-            tr.addView(image);
+
+         //   ll.addView(image, new FrameLayout.LayoutParams(100, 100,Gravity.BOTTOM|Gravity.RIGHT));
+            ll.addView(image,new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL));
+            ll.addView(imageplay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL));
+
+            tr.addView(ll);
             tr.addView(objTextviewReview);
-            tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+
+            tl.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
+
+
+            image.setId(counter);
+            image.setTag(valueTrailer.getSource());
+
+
+            image.setOnClickListener(new ImageView.OnClickListener() {
+
+                public void onClick(View v) {
+
+                    //to be added
+                    Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
+                    startVideo((String) v.getTag());
+
+                }
+
+
+            });
+
 
         }
 
