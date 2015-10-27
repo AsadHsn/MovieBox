@@ -817,7 +817,19 @@ public class MovieDetailActivityFragment extends Fragment {
             ImageView imageplay = new ImageView(getActivity());
             FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
             imageplay.setLayoutParams(layoutParams);
-            imageplay.setImageResource(R.drawable.playbuttoncircled100);
+
+            View detailsFrame = getActivity().findViewById(R.id.details_movie);
+            mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+            if(!mDualPane)
+            {
+                imageplay.setImageResource(R.drawable.playbutton50);
+            }
+            else
+            {
+                imageplay.setImageResource(R.drawable.playbuttoncircled100);
+            }
+
+
 
             TextView objTextviewReview = new TextView(getActivity());
             objTextviewReview.setText(valueTrailer.getTrailername());
