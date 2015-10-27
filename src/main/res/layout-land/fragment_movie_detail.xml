@@ -113,7 +113,7 @@
             android:background="#ffffffff"
             android:id="@+id/description_detail"
             android:textSize="12dp"
-            android:text="This is fantastic movie about ..."
+            android:text="@string/default_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="3dp"
@@ -134,7 +134,7 @@
             android:background="#7db5b5b5"/>
 
         <TextView
-            android:text="Trailers"
+            android:text="@string/Trailers"
             android:id="@+id/trailer_text"
             android:textSize="16dp"
             android:layout_width="match_parent"
@@ -153,11 +153,14 @@
             android:layout_marginRight="10dp"
             android:background="#7db5b5b5"/>
 
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            android:id="@+id/trailer_listview"
-        </ListView>
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/trailer_table_view"
+            android:background="#ffffffff"
+            >
+    </TableLayout>
+
 
         <HorizontalScrollView
             android:layout_width="wrap_content"
@@ -192,7 +195,7 @@
         <TextView
             android:elevation="8dp"
             android:textSize="16dp"
-            android:text="Reviews"
+            android:text="@string/Reviews"
             android:id="@+id/reviews_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -217,7 +220,7 @@
             android:background="#ffffffff"
             android:id="@+id/description_Review"
             android:textSize="12dp"
-            android:text="This is the best movie I have ever watched in my life ..."
+            android:text="@string/default_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="10dp"
@@ -227,7 +230,7 @@
             android:gravity="center_horizontal|center_vertical"/>
 
         <TextView
-            android:text="by"
+            android:text="@string/AuthorPrefix"
             android:id="@+id/atuhor_review"
             android:textSize="12dp"
             android:layout_width="match_parent"
@@ -246,7 +249,7 @@
             android:background="#7db5b5b5"/>
 
         <TextView
-            android:text=">>"
+            android:text="@string/OpenFurther"
             android:id="@+id/allreviews"
             android:textSize="16dp"
             android:layout_width="match_parent"

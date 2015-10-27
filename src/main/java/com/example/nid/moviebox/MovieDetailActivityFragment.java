@@ -82,18 +82,7 @@ public class MovieDetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-
- //       ListView listview = (ListView) rootView.findViewById(R.id.trailer_listview);
-
- //       MovieBean objMovieBean= new MovieBean();
-
-//        ArrayList<MovieBean> tempData = populateTrailerDummyData();
-//
-//        TrailerListAdapterObject = new TrailerList(getActivity(), tempData,1);
-//
-//        listview.setAdapter(TrailerListAdapterObject);
-
-       Intent intent = getActivity().getIntent();
+        Intent intent = getActivity().getIntent();
 
         objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
 
@@ -119,9 +108,6 @@ public class MovieDetailActivityFragment extends Fragment {
         Log.e( "Bundle Argument",Integer.toString(getArguments().getInt("mID", 0)) );
 
         Log.e("onStart","onStart");
-//        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
-
-        //To fetch the data again specially the Rating of the Movie
         fetchMovieDetails();
 
         return rootView;
@@ -130,33 +116,6 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-
-   //     Intent intent = getActivity().getIntent();
-
-////asad // to be removed        objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
-//        Log.e("onStart","onStart");
-////        Log.e(MovieDetailActivityFragment.class.getSimpleName(), objIntentMovieBean.getOverview());
-//
-//        //To fetch the data again specially the Rating of the Movie
-//        fetchMovieDetails();
-/*
-        ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
-
-        String PosterPathHref="http://image.tmdb.org/t/p/w154/"+objIntentMovieBean.getPoster_path();
-        Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
-
-        TextView objTitleText = (TextView) getView().findViewById(R.id.movie_title);
-        objTitleText.setText("Title: "+objIntentMovieBean.getTitle());
-
-        TextView objTextRelease = (TextView) getView().findViewById(R.id.movie_release_date);
-        objTextRelease.setText("Release Date: "+objIntentMovieBean.getRelease_date());
-
-        TextView objTextRating = (TextView) getView().findViewById(R.id.movie_rating);
-        objTextRating.setText("Rating: "+objIntentMovieBean.getTitle());
-
-        TextView objTextView = (TextView) getView().findViewById(R.id.description);
-        objTextView.setText("Synopsis: \n"+objIntentMovieBean.getOverview());
-*/
     }
 
     @Override
@@ -215,17 +174,6 @@ public class MovieDetailActivityFragment extends Fragment {
     private void methodThatDoesSomethingWhenTaskIsDone() {
 
         Log.v(FetchMovieDetailTask.class.getName(), "IN methodThatDoesSomethingWhenTaskIsDone-> ");
-/*
-        ImageView objImageView =(ImageView) getView().findViewById(R.id.image_in_detailFragment);
-
-        String PosterPathHref="http://image.tmdb.org/t/p/w185/"+objMovieBean.getPoster_path();
-        Picasso.with(getActivity()).load(PosterPathHref).into(objImageView);
-
-        TextView objTextView = (TextView) getView().findViewById(R.id.description);
-        objTextView.setText(objMovieBean.getOverview());
-
-*/
-
 
         ImageView objImageView = (ImageView) getView().findViewById(R.id.image_in_detailFragment);
 
@@ -285,37 +233,6 @@ public class MovieDetailActivityFragment extends Fragment {
         //asadty
         populateTableLayout(objMovieBean);
 
-//        for (final Trailer valueTrailer : objMovieBean.getTrailerList()) {
-//
-//            Log.v("getView====>", valueTrailer.getTrailername());
-//            Log.v("getView====>", valueTrailer.getSource());
-//
-//
-//            ImageView image = new ImageView(getActivity());
-//            //     String BackdropPathHref="http://image.tmdb.org/t/p/w185"+objMovieBean.getBackdrop_path();
-//            Picasso.with(getActivity()).load(PosterPathHref).into(image);
-//            //  image.setBackgroundResource(R.drawable.martianposter);
-//            image.setId(counter);
-//            image.setTag(valueTrailer.getSource());
-//            image.setImageResource(R.drawable.playbutton24);
-//            layout.addView(image);
-//            counter++;
-//
-//
-//            image.setOnClickListener(new ImageView.OnClickListener() {
-//
-//                public void onClick(View v) {
-//
-//                    //to be added
-//                    Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
-//                    startVideo((String) v.getTag());
-//
-//                }
-//
-//
-//            });
-//
-//        }
 
         TextView objTextviewReview = (TextView) getView().findViewById(R.id.description_Review);
         objTextviewReview.setLines(9);
@@ -338,23 +255,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 //to be added
                 Log.v("getView====>", "Review Onclicklistener called Id->" + v.getId());
-
-//                String textData = "";
-//                for (final Review valueReview : objMovieBean.getReviewlist()) {
-//                    // Log.v("getView====>",valueTrailer.getTrailerOrigin());
-//                    Log.v("getView====>", valueReview.getAuthor());
-//
-//                    textData = textData + "\"" + valueReview.getContent() + "\"" + "\n";
-//                    textData = textData + "\n" + "By " + valueReview.getAuthor() + "\n\n\n";
-//
-//                }
-//
-//                Intent IntentReviewDetailActivity = new Intent(getActivity(), ReviewDetail.class);
-//
-//                IntentReviewDetailActivity.putExtra("REVIEW", textData);
-//
-//                startActivity(IntentReviewDetailActivity);
-
 
                 showAllReviews(objMovieBean);
 
@@ -398,13 +298,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
 
             String apikey = getActivity().getString(R.string.api_key);
-
-            //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=releases,trailers
-            //https://api.themoviedb.org/3/movie/550?api_key=###&append_to_response=trailers
-            //http://api.themoviedb.org/3/movie/550/videos
-
-            //actual URL
-            // https://www.youtube.com/watch?v=8hP9D6kZseM
 
             try {
 
@@ -663,13 +556,15 @@ public class MovieDetailActivityFragment extends Fragment {
             Log.v("getCount Called", Integer.toString(adapterData.get(0).getTrailerList().size()));
             return adapterData.get(0).getTrailerList().size();
 
-            //  return super.getCount();
         }
 
 
     }
 
     private ArrayList<MovieBean> populateTrailerDummyData() {
+
+        //This method is not in use, I have created this intially to populate trailer dummy data
+        // when I was using List view Adapter but then had to discard it becasuse a scroll view cannot contain another adapter view inside it
 
         MovieBean objMovieBean = new MovieBean();
 
@@ -696,6 +591,9 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 
     public void startVideo(String id) {
+
+        //This will launch intent to open youtube app or via browser
+
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
             startActivity(intent);
@@ -708,6 +606,10 @@ public class MovieDetailActivityFragment extends Fragment {
 
 
     public void removefromSharedPrefrence(MovieBean objMovie) {
+
+        //This method will be used to remove a movie from shared prefrence when a user unschecks mark favourite
+
+
         ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
         ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
         objBlank.add(new MovieBean());
@@ -754,6 +656,9 @@ public class MovieDetailActivityFragment extends Fragment {
 
 
     public void addInSharedPrefrence(MovieBean objMovie) {
+
+        //This method is for adding a movie in shared prefrence
+
         ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
         ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
         MovieBean dummyData = new MovieBean();
@@ -800,6 +705,8 @@ public class MovieDetailActivityFragment extends Fragment {
 
     public boolean checkInSharedPrefrence(MovieBean objMovie) {
 
+        //This method is for checking a movie in shared prefrence
+
         ArrayList<MovieBean> objSharedPref = new ArrayList<MovieBean>();
         ArrayList<MovieBean> objBlank = new ArrayList<MovieBean>();
         MovieBean dummyData = new MovieBean();
@@ -842,6 +749,8 @@ public class MovieDetailActivityFragment extends Fragment {
     public void showAllReviews(MovieBean objMovieBean)
     {
 
+        //This method will launch a new fragment to display reviews.
+
         View detailsFrame = getActivity().findViewById(R.id.details_movie);
         mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
 
@@ -865,14 +774,6 @@ public class MovieDetailActivityFragment extends Fragment {
         }
         else
         {
-            //call listener callback method in activity
-            // mListener.onMovieSelected(objMovieBean);
-
-
-//            ReviewDetailFragment details = (ReviewDetailFragment)
-//                    getFragmentManager().findFragmentById(R.id.review_all_lay);
-//        //    if (details == null || details.getMovieId() != objMovieBean.getId()) {
-       //     if (details == null ) {
                 // Make new fragment to show this selection.
                 ReviewDetailFragment details = ReviewDetailFragment.newInstance(textData);
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -884,8 +785,6 @@ public class MovieDetailActivityFragment extends Fragment {
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.addToBackStack(null);
                 ft.commit();
-      //      }
-
 
 
         }
@@ -894,54 +793,38 @@ public class MovieDetailActivityFragment extends Fragment {
 
     public void populateTableLayout(MovieBean objobjMovieBean)
     {
+
+        //This method dynamically creates Table view
+        //It will use Framelayout to overlay play button on top of poster image and will also have trailer name in the next row.
+
         String PosterPathHref = "http://image.tmdb.org/t/p/w92" + objobjMovieBean.getPoster_path();
-
-
-
 
         TableLayout tl = (TableLayout) getActivity().findViewById(R.id.trailer_table_view);
 
-        TableRow tr= new TableRow(getActivity());
+        TableRow tr;
         int counter = 0;
 
         for (final Trailer valueTrailer : objobjMovieBean.getTrailerList()) {
 
             FrameLayout ll = new FrameLayout(getActivity());
             FrameLayout.LayoutParams layoutParamsFrame=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-         //   ll.setLayoutParams(layoutParamsFrame);
-
             tr= new TableRow(getActivity());
-        //    tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-/* Create a Button to be the row-content. */
 
             ImageView image = new ImageView(getActivity());
             Picasso.with(getActivity()).load(PosterPathHref).into(image);
             image.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
 
             ImageView imageplay = new ImageView(getActivity());
-       //     LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,Gravity.BOTTOM|Gravity.RIGHT);
             FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
-
-
-          //  layoutParams.gravity= Gravity.BOTTOM;
-         //   layoutParams.gravity= Gravity.RIGHT;
-         //   layoutParams.setMargins(10, 10, 10, 10);
-         //   imageplay.setBackgroundColor(Color.BLACK);
             imageplay.setLayoutParams(layoutParams);
             imageplay.setImageResource(R.drawable.playbuttoncircled100);
-          //  imageplay.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
-
 
             TextView objTextviewReview = new TextView(getActivity());
             objTextviewReview.setText(valueTrailer.getTrailername());
             objTextviewReview.setTextSize(18);
-           // objTextviewReview.setBackgroundColor(Color.BLACK);
             objTextviewReview.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-           // objTextviewReview.setTextColor(Color.parseColor("#FF5722"));
             objTextviewReview.setLayoutParams(new TableRow.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.FILL_PARENT));
 
-
-         //   ll.addView(image, new FrameLayout.LayoutParams(100, 100,Gravity.BOTTOM|Gravity.RIGHT));
             ll.addView(image,new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL));
             ll.addView(imageplay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL));
 
@@ -959,7 +842,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
                 public void onClick(View v) {
 
-                    //to be added
                     Log.v("getView====>", "Oclicklistener called Id->" + v.getId());
                     startVideo((String) v.getTag());
 

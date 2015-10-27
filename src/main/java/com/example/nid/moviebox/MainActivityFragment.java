@@ -62,15 +62,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         public void onMovieSelected(MovieBean moviebeasobj);
     }
 
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        try {
-//            mListener = (OnMovieSelectedListener) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString() + " must implement OnMovieSelectedListener");
-//        }
-//    }
 
     public MainActivityFragment() {
     }
@@ -85,10 +76,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         gridview = (GridView) rootView.findViewById(R.id.gridview_movie);
 
         MovieBean objMovieBean= new MovieBean();
-     //  objMovieBean.setPoster_path("/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg");
-      //  objMovieBean.setBackdrop_path("/8uO0gUM8aNqYLs1OsTBQiXu0fEv.jpg");
-
-
         ArrayList<MovieBean> tempData = populateDummyData();
 
 
@@ -255,7 +242,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             }
 
 
-            String apikey = getActivity().getString(R.string.api_key );
+            String apikey = getActivity().getString(R.string.api_key);
 
             int numDays = 7;
 
@@ -351,7 +338,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
         public ArrayList<MovieBean> MdbParser(String JsonStr)
         {
-            String strJson="{\"page\":1,\"results\":[{\"adult\":false,\"backdrop_path\":\"/t5KONotASgVKq4N19RyhIthWOPG.jpg\",\"genre_ids\":[28,12,878,53],\"id\":135397,\"original_language\":\"en\",\"original_title\":\"Jurassic World\",\"overview\":\"Twenty-two years after the events of Jurassic Park, Isla Nublar now features a fully functioning dinosaur theme park, Jurassic World, as originally envisioned by John Hammond.\",\"release_date\":\"2015-06-12\",\"poster_path\":\"/hTKME3PUzdS3ezqK5BZcytXLCUl.jpg\",\"popularity\":52.593315,\"title\":\"Jurassic World\",\"video\":false,\"vote_average\":7.0,\"vote_count\":2503},{\"adult\":false,\"backdrop_path\":\"/bIlYH4l2AyYvEysmS2AOfjO7Dn8.jpg\",\"genre_ids\":[878,28,53,12],\"id\":87101,\"original_language\":\"en\",\"original_title\":\"Terminator Genisys\",\"overview\":\"The year is 2029. John Connor, leader of the resistance continues the war against the machines. At the Los Angeles offensive, John's fears of the unknown future begin to emerge when TECOM spies reveal a new plot by SkyNet that will attack him from both fronts; past and future, and will ultimately change warfare forever.\",\"release_date\":\"2015-07-01\",\"poster_path\":\"/5JU9ytZJyR3zmClGmVm9q4Geqbd.jpg\",\"popularity\":41.391217,\"title\":\"Terminator Genisys\",\"video\":false,\"vote_average\":6.3,\"vote_count\":1085}] ,\"total_pages\":12297,\"total_results\":245922}";
+
 
             try {
                // JSONObject jsonBaseObject = new JSONObject(strJson);
@@ -634,13 +621,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         }
         else
         {
-            //call listener callback method in activity
-           // mListener.onMovieSelected(objMovieBean);
-
-
-       //     MovieDetailActivityFragment details = (MovieDetailActivityFragment)getFragmentManager().findFragmentById(R.id.details_movie);
-     //asad       if (details == null || details.getMovieId() != objMovieBean.getId()) {
-                // Make new fragment to show this selection.
+                   // Make new fragment to show this selection.
             MovieDetailActivityFragment details = MovieDetailActivityFragment.newInstance(objMovieBean.getId());
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 if (objMovieBean.getId() == 0) {
