@@ -174,14 +174,11 @@ public class MovieDetailActivityFragment extends Fragment {
         }
 
         //Saving full object to avoid fresh API call in case activity is destroyed and recreated
-
-        if (objIntentMovieBean != null) {
+       // if (objIntentMovieBean != null) {
+            if (objMovieBean != null) {
             Log.e("PUT PARCEL","Will do it below");
             savedInstanceState.putParcelable(MOVIE_FULL, objMovieBean);
         }
-
-
-
     }
 
 
