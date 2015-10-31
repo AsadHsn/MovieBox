@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -57,6 +58,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     String SHARED_PREFS_FILE2="SHARED_PREFS_FILE5";
     OnMovieSelectedListener mListener;
     boolean mDualPane;
+    String MOVIE_FULL="MOVIE_FULL";
 
     public interface OnMovieSelectedListener {
         public void onMovieSelected(MovieBean moviebeasobj);
@@ -114,7 +116,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                     objMbean.setTrailerList(null);
                     objMbean.setReviewlist(null);
 
-                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", objMbean);
+                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", (Serializable) objMbean);
 
                   //  startActivity(IntentMovieDetailActivity);
                     showMovieDetails(objMbean);
@@ -123,7 +125,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                 else
                 {
 
-                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", (MovieBean) mCustomMovieAdapter.getItem(position));
+                    IntentMovieDetailActivity.putExtra("MOVIEBEAN", (Serializable) mCustomMovieAdapter.getItem(position));
 
                   //  startActivity(IntentMovieDetailActivity);
                     showMovieDetails((MovieBean) mCustomMovieAdapter.getItem(position));
@@ -185,6 +187,8 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
         savedInstanceState.putString(SORT_SELECTION, sortCriteriaSelected);
         savedInstanceState.putInt(GRID_INDEX, indexValue);
+        //Parcelable extra
+       // savedInstanceState.putParcelableArrayList(MOVIE_FULL, (ArrayList<MovieBean>) objArrListMovieBean);
 
 
     }
@@ -616,7 +620,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         {
 
             Intent IntentMovieDetailActivity = new Intent(getActivity(), MovieDetailActivity.class);
-            IntentMovieDetailActivity.putExtra("MOVIEBEAN", objMovieBean);
+            IntentMovieDetailActivity.putExtra("MOVIEBEAN", (Serializable) objMovieBean);
             startActivity(IntentMovieDetailActivity);
         }
         else

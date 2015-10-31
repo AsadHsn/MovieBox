@@ -54,6 +54,8 @@ public class MovieDetailActivityFragment extends Fragment {
     TrailerList TrailerListAdapterObject;
     String SHARED_PREFS_FILE2="SHARED_PREFS_FILE5";
     String MOVIE_ID = "MOVIE_ID";
+    String MOVIE_FULL = "MOVIE_FULL";
+
     boolean mDualPane;
 
 
@@ -81,7 +83,7 @@ public class MovieDetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+            View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         Intent intent = getActivity().getIntent();
 
         objIntentMovieBean = (MovieBean) intent.getSerializableExtra("MOVIEBEAN");
@@ -107,8 +109,15 @@ public class MovieDetailActivityFragment extends Fragment {
         if(getArguments()!=null)
         Log.e( "Bundle Argument",Integer.toString(getArguments().getInt("mID", 0)) );
 
-        Log.e("onStart","onStart");
-        fetchMovieDetails();
+        Log.e("onStart", "onStart");
+
+        if(savedInstanceState==null || !savedInstanceState.containsKey(MOVIE_FULL))
+        {
+            //call fetchMovieDetails()
+            fetchMovieDetails();
+        }
+
+       // fetchMovieDetails();
 
         return rootView;
     }
@@ -116,6 +125,22 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(MOVIE_FULL))
+        {
+            // retreive parcelable objmoviebean here
+            objMovieBean=(MovieBean)savedInstanceState.getParcelable(MOVIE_FULL);
+            Log.e("objIntentMovieBean", Integer.toString( objMovieBean.getId()));
+            methodThatDoesSomethingWhenTaskIsDone();
+        }
+
+
     }
 
     @Override
@@ -123,19 +148,16 @@ public class MovieDetailActivityFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.e("onActivityC frag2", "haha");
 
-        if (savedInstanceState != null) {
-            objIntentMovieBean=new MovieBean();
-            objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
-            Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
-        }
-//        try(
-//        else if(getArguments().getInt("mID", 0)!=0)
-//        {
+//        if (savedInstanceState != null) {
 //            objIntentMovieBean=new MovieBean();
-//            objIntentMovieBean.setId(getArguments().getInt("mID", 0));
-//
+//            objIntentMovieBean.setId(savedInstanceState.getInt(MOVIE_ID));
+//            Log.e("onActivityCreated", Integer.toString(savedInstanceState.getInt(MOVIE_ID)));
+//            Log.e("onActivityC Check->",  Boolean.toString(savedInstanceState.containsKey(MOVIE_FULL)));
 //        }
-//
+
+
+
+
 
 
     }
@@ -150,6 +172,14 @@ public class MovieDetailActivityFragment extends Fragment {
         if (objIntentMovieBean != null) {
             savedInstanceState.putInt(MOVIE_ID, objIntentMovieBean.getId());
         }
+
+        //Saving full object to avoid fresh API call in case activity is destroyed and recreated
+
+        if (objIntentMovieBean != null) {
+            Log.e("PUT PARCEL","Will do it below");
+            savedInstanceState.putParcelable(MOVIE_FULL, objMovieBean);
+        }
+
 
 
     }
@@ -375,6 +405,7 @@ public class MovieDetailActivityFragment extends Fragment {
             }
 
             try {
+                Log.e("API Call Made","--------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+forecastJsonStr);
                 return MovieDetailParser(forecastJsonStr);
                 //   return "test";
 

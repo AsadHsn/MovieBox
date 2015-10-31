@@ -5,33 +5,42 @@ package com.example.nid.moviebox;
  */
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 //This class implements serializable to pass this as an object via Intent to second Activity
-public class MovieBean implements Serializable {
+public class MovieBean implements Serializable, Parcelable {
     boolean adult ;
     String backdrop_path ;
     String original_title ;
     String overview ;
     String release_date ;
     String poster_path ;
+    boolean video ;
+    float vote_average ;
+    int vote_count ;
     float popularity ;
     String title ;
     boolean isFavourite=false;
+    List<Integer> genre_ids;
+    int id;
+    List<Trailer> trailerList;
+    List<Review> reviewlist;
 
-    public boolean isFavourite() {
-        return isFavourite;
-    }
+
 
     public void setIsFavourite(boolean isFavourite) {
         this.isFavourite = isFavourite;
     }
 
-    boolean video ;
-    float vote_average ;
-    int vote_count ;
 
+    public boolean isFavourite() {
+        return isFavourite;
+    }
 
     public int getId() {
         return id;
@@ -41,12 +50,7 @@ public class MovieBean implements Serializable {
         this.id = id;
     }
 
-    List<Integer> genre_ids;
-    int id;
 
-    List<Trailer> trailerList;
-
-    List<Review> reviewlist;
 
     public List<Review> getReviewlist() {
         return reviewlist;
@@ -141,4 +145,95 @@ public class MovieBean implements Serializable {
         this.vote_count = vote_count;
     }
 
+
+    protected MovieBean() {
+    }
+
+
+    protected MovieBean(Parcel in) {
+        adult = in.readByte() != 0x00;
+        backdrop_path = in.readString();
+        original_title = in.readString();
+        overview = in.readString();
+        release_date = in.readString();
+        poster_path = in.readString();
+        video = in.readByte() != 0x00;
+        vote_average = in.readFloat();
+        vote_count = in.readInt();
+        popularity = in.readFloat();
+        title = in.readString();
+        isFavourite = in.readByte() != 0x00;
+        if (in.readByte() == 0x01) {
+            genre_ids = new ArrayList<Integer>();
+            in.readList(genre_ids, Integer.class.getClassLoader());
+        } else {
+            genre_ids = null;
+        }
+        id = in.readInt();
+        if (in.readByte() == 0x01) {
+            trailerList = new ArrayList<Trailer>();
+            in.readList(trailerList, Trailer.class.getClassLoader());
+        } else {
+            trailerList = null;
+        }
+        if (in.readByte() == 0x01) {
+            reviewlist = new ArrayList<Review>();
+            in.readList(reviewlist, Review.class.getClassLoader());
+        } else {
+            reviewlist = null;
+        }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (adult ? 0x01 : 0x00));
+        dest.writeString(backdrop_path);
+        dest.writeString(original_title);
+        dest.writeString(overview);
+        dest.writeString(release_date);
+        dest.writeString(poster_path);
+        dest.writeByte((byte) (video ? 0x01 : 0x00));
+        dest.writeFloat(vote_average);
+        dest.writeInt(vote_count);
+        dest.writeFloat(popularity);
+        dest.writeString(title);
+        dest.writeByte((byte) (isFavourite ? 0x01 : 0x00));
+        if (genre_ids == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(genre_ids);
+        }
+        dest.writeInt(id);
+        if (trailerList == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(trailerList);
+        }
+        if (reviewlist == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(reviewlist);
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<MovieBean> CREATOR = new Parcelable.Creator<MovieBean>() {
+        @Override
+        public MovieBean createFromParcel(Parcel in) {
+            return new MovieBean(in);
+        }
+
+        @Override
+        public MovieBean[] newArray(int size) {
+            return new MovieBean[size];
+        }
+    };
 }
